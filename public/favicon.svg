@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Shield shape -->
+  <path d="M32 6 L52 14 L52 32 C52 45 32 58 32 58 C32 58 12 45 12 32 L12 14 Z"
+        fill="none" stroke="#f59e0b" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Inner shield glow fill -->
+  <path d="M32 10 L49 17 L49 32 C49 43 32 54 32 54 C32 54 15 43 15 32 L15 17 Z"
+        fill="#f59e0b" fill-opacity="0.15"/>
+
+  <!-- Letters "CH" -->
+  <text x="32" y="38"
+        font-family="Arial Black, Arial, sans-serif"
+        font-size="18"
+        font-weight="900"
+        fill="#f59e0b"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="-1">CH</text>
+</svg>
