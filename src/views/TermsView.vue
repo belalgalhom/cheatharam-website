@@ -53,7 +53,7 @@
       </section>
 
       <div class="p-8 bg-slate-800/30 border border-white/5 rounded-3xl">
-        <p class="text-slate-400">For questions regarding these Terms, please contact the CheatHaram team via the official Discord server.</p>
+        <p class="text-slate-400">For questions regarding these Terms, please contact the CheatHaram team via the <a href="https://discord.gg/fPwZNBskNK" target="_blank" class="text-amber-500 hover:text-amber-400 font-semibold transition-colors underline underline-offset-4">official Discord server</a>.</p>
       </div>
     </div>
   </div>

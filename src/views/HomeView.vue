@@ -52,7 +52,7 @@ const developers = [
             class="px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all border border-white/10 flex items-center justify-center gap-2"
           >
             <Users class="w-5 h-5" />
-            Live Activity
+            Online Players
           </RouterLink>
         </div>
       </div>

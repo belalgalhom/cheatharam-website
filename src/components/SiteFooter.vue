@@ -34,7 +34,7 @@ import { Shield } from 'lucide-vue-next'
             </li>
             <li>
               <RouterLink to="/online" class="text-slate-500 hover:text-amber-500 transition-colors"
-                >Live Activity</RouterLink
+                >Online Players</RouterLink
               >
             </li>
             <li>

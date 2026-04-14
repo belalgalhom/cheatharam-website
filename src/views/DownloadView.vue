@@ -30,7 +30,7 @@ const features = [
             <Download class="w-6 h-6 group-hover:scale-125 transition-transform" />
             DOWNLOAD CHEATHARAM
           </a>
-          <a href="https://discord.gg/sof2" target="_blank" class="px-10 py-5 bg-slate-800 text-white font-bold text-lg rounded-2xl hover:bg-slate-700 transition-all border border-white/10 flex items-center justify-center gap-3">
+          <a href="https://discord.gg/fPwZNBskNK" target="_blank" class="px-10 py-5 bg-slate-800 text-white font-bold text-lg rounded-2xl hover:bg-slate-700 transition-all border border-white/10 flex items-center justify-center gap-3">
             Join Support Discord
           </a>
         </div>

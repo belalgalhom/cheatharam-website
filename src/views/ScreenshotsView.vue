@@ -1,15 +1,28 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Camera, User, Hash, Maximize2, Download } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { Camera, User, Hash, Maximize2, Download, ArrowLeft } from 'lucide-vue-next'
 
-const screenshots = ref([
+const route = useRoute()
+const filterGuid = computed(() => route.query.guid as string | undefined)
+const filterName = computed(() => route.query.name as string | undefined)
+
+const allScreenshots = [
   { id: 1, player: 'Soldier_X', guid: '0x8FA72BB3', date: '2024-04-15 10:30', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
   { id: 2, player: 'TriggerHappy', guid: '0x99B210AA', date: '2024-04-15 09:12', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
   { id: 3, player: 'Ghost_Ops', guid: '0x1CC253DD', date: '2024-04-14 23:45', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
   { id: 4, player: 'Silent_Dagger', guid: '0x7E3310FF', date: '2024-04-14 21:20', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
   { id: 5, player: 'ReconMaster', guid: '0x44B29EE1', date: '2024-04-14 18:05', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
   { id: 6, player: 'Vanguard', guid: '0x22F109BB', date: '2024-04-14 15:30', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-])
+  { id: 7, player: 'Soldier_X', guid: '0x8FA72BB3', date: '2024-04-13 14:10', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
+]
+
+const screenshots = computed(() => {
+  if (filterGuid.value) {
+    return allScreenshots.filter(s => s.guid === filterGuid.value)
+  }
+  return allScreenshots
+})
 
 const selectedImage = ref<string | null>(null)
 
@@ -24,12 +37,25 @@ const closeLightbox = () => {
 
 <template>
   <div class="container mx-auto px-6 py-12">
+    <!-- Filter Banner -->
+    <div v-if="filterGuid" class="flex items-center justify-between mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
+      <div class="flex items-center gap-3">
+        <Camera class="w-5 h-5 text-amber-500" />
+        <span class="text-amber-400 font-bold">Showing screenshots for: <span class="text-white">{{ filterName || filterGuid }}</span></span>
+        <code class="text-xs text-slate-400 font-mono bg-black/30 px-2 py-1 rounded">{{ filterGuid }}</code>
+      </div>
+      <RouterLink to="/screenshots" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-bold">
+        <ArrowLeft class="w-4 h-4" />
+        All Screenshots
+      </RouterLink>
+    </div>
+
     <div class="flex items-center justify-between mb-12">
       <div>
-        <h1 class="text-4xl font-bold mb-2">Player Screenshots</h1>
-        <p class="text-slate-400">Automated captures from protected game sessions.</p>
+        <h1 class="text-4xl font-bold mb-2">{{ filterGuid ? `${filterName || filterGuid}'s Screenshots` : 'Player Screenshots' }}</h1>
+        <p class="text-slate-400">{{ filterGuid ? `${screenshots.length} screenshot(s) found for this player.` : 'Automated captures from protected game sessions.' }}</p>
       </div>
-      <div class="hidden md:flex items-center gap-2 text-amber-500 bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20">
+      <div v-if="!filterGuid" class="hidden md:flex items-center gap-2 text-amber-500 bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20">
         <Camera class="w-5 h-5" />
         <span class="font-bold text-sm tracking-widest uppercase">Live Submissions</span>
       </div>
