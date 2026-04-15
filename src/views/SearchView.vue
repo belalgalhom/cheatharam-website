@@ -7,11 +7,11 @@ const searchResult = ref<any[] | null>(null)
 const isSearching = ref(false)
 
 const allPlayers = [
-  { name: 'Soldier_X', guid: '0x8FA72BB3', lastSeen: '2 minutes ago', status: 'Clean' },
-  { name: 'Ghost_Ops', guid: '0x1CC253DD', lastSeen: '5 hours ago', status: 'Clean' },
-  { name: 'TriggerHappy', guid: '0x99B210AA', lastSeen: 'Just now', status: 'Clean' },
-  { name: 'Cheater_99', guid: '0xDEADBEEF', lastSeen: '3 days ago', status: 'Banned' },
-  { name: 'Silent_Dagger', guid: '0x7E3310FF', lastSeen: '1 day ago', status: 'Clean' },
+  { name: 'Soldier_X', guid: '0x8FA72BB3', lastSeen: '2 minutes ago', online: true },
+  { name: 'Ghost_Ops', guid: '0x1CC253DD', lastSeen: '5 hours ago', online: false },
+  { name: 'TriggerHappy', guid: '0x99B210AA', lastSeen: 'Just now', online: true },
+  { name: 'Cheater_99', guid: '0xDEADBEEF', lastSeen: '3 days ago', online: false },
+  { name: 'Silent_Dagger', guid: '0x7E3310FF', lastSeen: '1 day ago', online: false },
 ]
 
 const handleSearch = () => {
@@ -32,7 +32,7 @@ const handleSearch = () => {
   <div class="container mx-auto px-6 py-12 max-w-4xl">
     <div class="text-center mb-12">
       <h1 class="text-4xl font-bold mb-4">Player Database</h1>
-      <p class="text-slate-400">Search for player history, GUID verification, and ban status.</p>
+      <p class="text-slate-400">Search for player history and GUID verification.</p>
     </div>
 
     <!-- Search Bar -->
@@ -94,13 +94,25 @@ const handleSearch = () => {
             </div>
             <div
               :class="[
-                'px-6 py-2 rounded-xl text-sm font-bold uppercase tracking-wider border',
-                player.status === 'Banned'
-                  ? 'bg-red-500/10 text-red-500 border-red-500/20'
-                  : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+                'flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold uppercase tracking-wider border',
+                player.online
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-slate-700/50 text-slate-400 border-white/10',
               ]"
             >
-              {{ player.status }}
+              <span class="relative flex w-2.5 h-2.5">
+                <span
+                  v-if="player.online"
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+                ></span>
+                <span
+                  :class="[
+                    'relative inline-flex rounded-full w-2.5 h-2.5',
+                    player.online ? 'bg-emerald-400' : 'bg-slate-500',
+                  ]"
+                ></span>
+              </span>
+              {{ player.online ? 'Online' : 'Offline' }}
             </div>
             <RouterLink
               :to="{ path: '/screenshots', query: { guid: player.guid, name: player.name } }"
