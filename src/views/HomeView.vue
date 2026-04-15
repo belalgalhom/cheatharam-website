@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Search, User, Server, ShieldCheck, Download, Users, Camera } from 'lucide-vue-next'
+import { User, Server, ShieldCheck, Download, Users, Camera } from 'lucide-vue-next'
 
 const developers = [
   {
     name: 'Dracula',
     role: 'Lead Developer',
-    bio: 'Specialist in low-level memory protection and kernel-mode anti-tamper systems.',
   },
   {
     name: 'Devil',
     role: 'Security Researcher',
-    bio: 'Expert in network protocol analysis and heuristic detection algorithms.',
   },
 ]
 </script>
@@ -84,9 +82,6 @@ const developers = [
               </p>
             </div>
           </div>
-          <p class="text-slate-400 leading-relaxed">
-            {{ dev.bio }}
-          </p>
         </div>
       </div>
     </section>
@@ -95,7 +90,7 @@ const developers = [
     <section
       class="container mx-auto px-6 bg-slate-900/50 py-20 rounded-[3rem] border border-white/5"
     >
-      <div class="grid md:grid-cols-3 gap-12">
+      <div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
         <div class="text-center">
           <div class="mx-auto w-12 h-12 mb-6 text-amber-500">
             <ShieldCheck class="w-full h-full" />
@@ -107,11 +102,6 @@ const developers = [
           <div class="mx-auto w-12 h-12 mb-6 text-amber-500"><Camera class="w-full h-full" /></div>
           <h3 class="text-xl font-bold mb-2">Automated SS</h3>
           <p class="text-slate-400">Regular player screenshots with cloud logging.</p>
-        </div>
-        <div class="text-center">
-          <div class="mx-auto w-12 h-12 mb-6 text-amber-500"><Search class="w-full h-full" /></div>
-          <h3 class="text-xl font-bold mb-2">Real-time Bans</h3>
-          <p class="text-slate-400">Global blacklists and HWID enforcement.</p>
         </div>
       </div>
     </section>

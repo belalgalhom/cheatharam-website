@@ -29,15 +29,15 @@
         <ul class="space-y-3">
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Attempting to bypass, disable, or tamper with any component of CheatHaram.</li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Using any cheat software, hacks, exploits, or unauthorized third-party tools while CheatHaram is active.</li>
-          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Sharing, selling, or distributing your account or GUID to evade bans.</li>
+          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Sharing, selling, or distributing your account or GUID to evade security measures.</li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Attempting to disrupt servers or other players' connections.</li>
         </ul>
       </section>
 
       <section>
-        <h2 class="text-2xl font-bold text-white mb-4">4. Enforcement & Bans</h2>
+        <h2 class="text-2xl font-bold text-white mb-4">4. Enforcement & Restrictions</h2>
         <div class="h-px bg-white/5 mb-6"></div>
-        <p>CheatHaram reserves the right to issue hardware-level (HWID) bans at its sole discretion for any violation of these Terms. Bans are permanent unless explicitly lifted by the CheatHaram team. Ban evasion will result in further enforcement action.</p>
+        <p>CheatHaram reserves the right to issue enforcement actions at its sole discretion for any violation of these Terms. Restrictions are permanent unless explicitly lifted by the CheatHaram team. Evasion of these measures will result in further enforcement action.</p>
       </section>
 
       <section>

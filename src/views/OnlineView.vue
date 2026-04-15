@@ -35,7 +35,7 @@ const players = ref([
       <!-- Table Header -->
       <div class="hidden md:grid grid-cols-5 px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">
         <span>Player Name</span>
-        <span>Unique GUID</span>
+        <span>Guid</span>
         <span>Connected Server</span>
         <span class="text-center">Status</span>
         <span class="text-right">Actions</span>

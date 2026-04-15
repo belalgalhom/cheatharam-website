@@ -22,9 +22,8 @@
         <div class="h-px bg-white/5 mb-6"></div>
         <p class="mb-4">When you use CheatHaram, we may collect the following information:</p>
         <ul class="space-y-3">
-          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong class="text-white">Hardware Identifiers (HWID)</strong> — Used to uniquely identify your device for ban enforcement and verification purposes.</span></li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong class="text-white">Player GUID</strong> — Your in-game identifier provided by the Soldier of Fortune II client.</span></li>
-          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong class="text-white">Screenshots</strong> — When a player or administrator issues the in-game command <code class="text-amber-400 bg-black/30 px-1.5 py-0.5 rounded text-sm font-mono">@ch_fs &lt;GUID&gt;</code>, CheatHaram automatically takes a screenshot of the targeted player's screen. This screenshot is then stored and made available to server administrators for review.</span></li>
+          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong class="text-white">Screenshots</strong> — When a player issues the in-game command <code class="text-amber-400 bg-black/30 px-1.5 py-0.5 rounded text-sm font-mono">@ch_fs &lt;GUID&gt;</code>, CheatHaram automatically takes a screenshot of the targeted player's screen. This screenshot is then stored and made available to server administrators for review.</span></li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong class="text-white">Process List Snapshots</strong> — A list of running processes at the time of game sessions to detect unauthorized software.</span></li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong class="text-white">IP Address</strong> — Used for session logging and abuse detection. Not shared with third parties.</span></li>
         </ul>
@@ -36,7 +35,7 @@
         <p class="mb-4">Collected data is used exclusively for the following purposes:</p>
         <ul class="space-y-3">
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Verifying that you are not running unauthorized cheat software.</li>
-          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Enforcing bans and preventing ban evasion.</li>
+          <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Enforcing security measures and preventing system evasion.</li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Providing server administrators with verification evidence.</li>
           <li class="flex items-start gap-3"><span class="mt-1.5 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Improving the detection accuracy of CheatHaram.</li>
         </ul>
@@ -57,7 +56,7 @@
       <section>
         <h2 class="text-2xl font-bold text-white mb-4">6. Your Rights</h2>
         <div class="h-px bg-white/5 mb-6"></div>
-        <p>You may request the deletion of your data at any time by contacting the CheatHaram team. Note that deletion of ban-related records may not be possible where enforcement integrity must be maintained.</p>
+        <p>You may request the deletion of your data at any time by contacting the CheatHaram team. Note that deletion of security-related records may not be possible where enforcement integrity must be maintained.</p>
       </section>
 
       <div class="p-8 bg-slate-800/30 border border-white/5 rounded-3xl">

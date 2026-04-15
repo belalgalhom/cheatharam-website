@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Download, ShieldCheck, Zap, Monitor, Cpu, Globe } from 'lucide-vue-next'
+import { Download, ShieldCheck, Zap, Monitor, Cpu } from 'lucide-vue-next'
 
 const features = [
   { icon: ShieldCheck, title: 'Kernel-Level Anti-Tamper', desc: 'Protected by low-level monitor service that blocks memory manipulation.' },
   { icon: Zap, title: 'Zero Latency', desc: 'Ultra-light footprint. Zero impact on game FPS or network stability.' },
-  { icon: Monitor, title: 'HWID Verification', desc: 'Unique hardware-based identity prevents ban evasion effectively.' },
-  { icon: Cpu, title: 'Auto-Update System', desc: 'Always stay protected with our seamless background signature updates.' },
-  { icon: Globe, title: 'Global Ban List', desc: 'Instant enforcement across all member servers in our secure network.' }
+  { icon: Monitor, title: 'HWID Verification', desc: 'Unique hardware-based identity ensures consistent enforcement effectively.' },
+  { icon: Cpu, title: 'Auto-Update System', desc: 'Always stay protected with our seamless background signature updates.' }
 ]
 </script>
 
