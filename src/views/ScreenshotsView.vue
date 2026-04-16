@@ -7,21 +7,39 @@ const route = useRoute()
 const filterGuid = computed(() => route.query.guid as string | undefined)
 const filterName = computed(() => route.query.name as string | undefined)
 
-const allScreenshots = [
-  { id: 1, player: 'Soldier_X', guid: '0x8FA72BB3', date: '2024-04-15 10:30', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-  { id: 2, player: 'TriggerHappy', guid: '0x99B210AA', date: '2024-04-15 09:12', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-  { id: 3, player: 'Ghost_Ops', guid: '0x1CC253DD', date: '2024-04-14 23:45', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-  { id: 4, player: 'Silent_Dagger', guid: '0x7E3310FF', date: '2024-04-14 21:20', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-  { id: 5, player: 'ReconMaster', guid: '0x44B29EE1', date: '2024-04-14 18:05', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-  { id: 6, player: 'Vanguard', guid: '0x22F109BB', date: '2024-04-14 15:30', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-  { id: 7, player: 'Soldier_X', guid: '0x8FA72BB3', date: '2024-04-13 14:10', url: '/src/assets/sof2_screenshot1_1776206465789.png' },
-]
+const API_URL = 'https://api.ch-sof2.online'
+const screenshots = ref<any[]>([])
 
-const screenshots = computed(() => {
+import { onMounted } from 'vue'
+
+const fetchScreenshots = async () => {
   if (filterGuid.value) {
-    return allScreenshots.filter(s => s.guid === filterGuid.value)
+    try {
+      const searchRes = await fetch(`${API_URL}/clients/search?guid=${filterGuid.value}`)
+      if (searchRes.ok) {
+        const users = await searchRes.json()
+        if (users.length > 0) {
+          const ssRes = await fetch(`${API_URL}/players/${users[0].id}/fairshots`)
+          if (ssRes.ok) {
+            const data = await ssRes.json()
+            screenshots.value = data.map((s: any, i: number) => ({
+              id: i,
+              player: filterName.value || filterGuid.value,
+              guid: filterGuid.value,
+              date: new Date(s.createdAt).toLocaleString(),
+              url: s.imageUrl
+            }))
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
-  return allScreenshots
+}
+
+onMounted(() => {
+  fetchScreenshots()
 })
 
 const selectedIndex = ref<number | null>(null)
@@ -87,17 +105,17 @@ const toggleZoom = (e: Event) => {
 
     <!-- Gallery Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div v-for="(ss, index) in screenshots" :key="ss.id" 
+      <div v-for="(ss, index) in screenshots" :key="ss.id"
            class="group relative bg-slate-800/30 border border-white/5 rounded-[2rem] overflow-hidden hover:border-amber-500/30 transition-all">
         <!-- Image Container -->
         <div class="relative aspect-video overflow-hidden border-b border-white/5">
-          <img :src="ss.url" :alt="`Screenshot by ${ss.player}`" 
+          <img :src="ss.url" :alt="`Screenshot by ${ss.player}`"
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
-          
+
           <!-- Hover Overlay -->
           <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-            <button @click="openLightbox(index)" 
+            <button @click="openLightbox(index)"
                     class="p-4 bg-amber-500 text-black rounded-full hover:scale-110 transition-transform shadow-xl">
               <Maximize2 class="w-6 h-6" />
             </button>
@@ -132,11 +150,11 @@ const toggleZoom = (e: Event) => {
 
     <!-- Lightbox -->
     <Teleport to="body">
-      <div v-if="selectedIndex !== null" 
+      <div v-if="selectedIndex !== null"
            @click="closeLightbox"
            class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex items-center justify-center overscroll-none transition-all duration-300"
            :class="isZoomed ? 'overflow-auto' : 'overflow-hidden p-6'">
-        
+
         <!-- Top right controls -->
         <div class="fixed top-8 right-8 flex items-center gap-4 z-[110]">
           <button @click="toggleZoom" class="p-3 bg-white/10 text-white rounded-xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md shadow-2xl">
@@ -149,26 +167,26 @@ const toggleZoom = (e: Event) => {
         </div>
 
         <!-- Previous navigation -->
-        <button @click="prevImage" v-if="screenshots.length > 1" 
+        <button @click="prevImage" v-if="screenshots.length > 1"
                 class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 bg-white/5 text-white rounded-2xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md z-[110] shadow-2xl group">
           <ChevronLeft class="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
         </button>
 
         <!-- Next navigation -->
-        <button @click="nextImage" v-if="screenshots.length > 1" 
+        <button @click="nextImage" v-if="screenshots.length > 1"
                 class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 bg-white/5 text-white rounded-2xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md z-[110] shadow-2xl group">
           <ChevronRight class="w-8 h-8 group-hover:translate-x-1 transition-transform" />
         </button>
 
         <!-- Dynamic Image Wrapper -->
-        <div class="w-full h-full flex flex-col transition-all duration-500" 
+        <div class="w-full h-full flex flex-col transition-all duration-500"
              :class="isZoomed ? 'items-start justify-start p-10' : 'items-center justify-center p-6'">
-          <img :src="screenshots[selectedIndex!]?.url" 
+          <img :src="screenshots[selectedIndex!]?.url"
                @click.stop="toggleZoom"
-               alt="Enlarged screenshot" 
+               alt="Enlarged screenshot"
                class="shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 transition-all duration-500 origin-center shrink-0"
                :class="isZoomed ? 'min-w-[150vw] cursor-zoom-out rounded-xl' : 'max-w-full max-h-[85vh] object-contain cursor-zoom-in rounded-2xl'" />
-               
+
           <div v-if="!isZoomed" @click.stop class="mt-6 flex items-center gap-3 bg-white/5 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 text-white shadow-2xl z-[105]">
             <User class="w-4 h-4 text-amber-500" />
             <span class="font-bold tracking-wide">{{ screenshots[selectedIndex!]?.player }}</span>

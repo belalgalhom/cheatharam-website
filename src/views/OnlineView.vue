@@ -2,13 +2,27 @@
 import { ref } from 'vue'
 import { Server, User, Hash, Camera } from 'lucide-vue-next'
 
-const players = ref([
-  { id: 1, name: 'Soldier_X', guid: '0x8FA72BB3', server: 'SOF2 | Public Frag-Fest', country: 'US' },
-  { id: 2, name: 'Ghost_Ops', guid: '0x1CC253DD', server: 'SOF2 | COMPETITIVE HUB', country: 'DE' },
-  { id: 3, name: 'TriggerHappy', guid: '0x99B210AA', server: 'SOF2 | Public Frag-Fest', country: 'RU' },
-  { id: 4, name: 'Silent_Dagger', guid: '0x7E3310FF', server: 'SOF2 | Clan War Server', country: 'UK' },
-  { id: 5, name: 'ReconMaster', guid: '0x44B29EE1', server: 'SOF2 | COMPETITIVE HUB', country: 'FR' },
-])
+const API_URL = 'https://api.ch-sof2.online'
+const players = ref<any[]>([])
+
+import { onMounted } from 'vue'
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`${API_URL}/players/online`)
+    if (res.ok) {
+      const data = await res.json()
+      players.value = data.players.map((p: any) => ({
+        id: p.clientId,
+        name: p.name,
+        guid: p.guid,
+        server: p.server || 'Unknown Server'
+      })) || []
+    }
+  } catch (err) {
+    console.error(err)
+  }
+})
 </script>
 
 <template>

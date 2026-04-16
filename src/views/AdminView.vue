@@ -21,9 +21,7 @@ const loginError = ref('')
 const isLoggingIn = ref(false)
 
 const activeTab = ref('logs')
-
-const VALID_USERS_B64 = ['ZGV2aWw=', 'ZHJhY3VsYQ==']
-const ADMIN_PASS_B64 = 'aGVzdGFydGVkaW5zdWx0bXlmYW1pbHlteXNoaXQ2NjY='
+const API_URL = 'https://api.ch-sof2.online'
 
 const logs = ref([
   {
@@ -202,40 +200,63 @@ const newWhitelistHash = ref('')
 const isAddingWhitelist = ref(false)
 const whitelistStatus = ref('')
 
-const whitelistedFiles = ref([
-  {
-    id: 1,
-    name: 'custom_sounds.pk3',
-    hash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
-    added: '2026-04-10',
-  },
-  {
-    id: 2,
-    name: 'hd_textures_v2.pk3',
-    hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    added: '2026-04-12',
-  },
-])
+const whitelistedFiles = ref<any[]>([])
 
-const handleAddWhitelist = () => {
+const fetchWhitelists = async () => {
+  try {
+    const token = localStorage.getItem('ch_auth_token')
+    const response = await fetch(`${API_URL}/whitelists`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    if (response.ok) {
+      const data = await response.json()
+      whitelistedFiles.value = data.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        hash: item.hash,
+        added: item.createdAt ? new Date(item.createdAt).toISOString().substring(0, 10) : new Date().toISOString().substring(0, 10),
+      }))
+    } else if (response.status === 401) {
+       handleLogout()
+    }
+  } catch (e) {
+    console.error('Failed to fetch whitelists', e)
+  }
+}
+
+
+const handleAddWhitelist = async () => {
   if (!newWhitelistName.value || !newWhitelistHash.value) return
   isAddingWhitelist.value = true
-  setTimeout(() => {
-    whitelistedFiles.value.unshift({
-      id: Date.now(),
-      name: newWhitelistName.value,
-      hash: newWhitelistHash.value,
-      added: new Date().toISOString().substring(0, 10),
+
+  try {
+    const token = localStorage.getItem('ch_auth_token')
+    const response = await fetch(`${API_URL}/whitelists`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name: newWhitelistName.value, hash: newWhitelistHash.value })
     })
-    whitelistStatus.value = `File ${newWhitelistName.value} successfully whitelisted.`
-    newWhitelistName.value = ''
-    newWhitelistHash.value = ''
+
+    if (response.ok) {
+      whitelistStatus.value = `File ${newWhitelistName.value} successfully whitelisted.`
+      newWhitelistName.value = ''
+      newWhitelistHash.value = ''
+      fetchWhitelists()
+      showWhitelistForm.value = false
+      setTimeout(() => {
+        whitelistStatus.value = ''
+      }, 3000)
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
     isAddingWhitelist.value = false
-    showWhitelistForm.value = false
-    setTimeout(() => {
-      whitelistStatus.value = ''
-    }, 3000)
-  }, 800)
+  }
 }
 
 // GUID Form State
@@ -245,20 +266,7 @@ const newGuidCustom = ref('')
 const isAddingGuid = ref(false)
 const guidStatus = ref('')
 
-const customGuidsList = ref([
-  {
-    id: 1,
-    original: '0x8FA72BB3',
-    custom: '0xADMIN123',
-    added: '2026-03-15',
-  },
-  {
-    id: 2,
-    original: '0x1CC253DD',
-    custom: '0xVIPUSER1',
-    added: '2026-04-01',
-  },
-])
+const customGuidsList = ref<any[]>([])
 
 const handleAddGuid = () => {
   if (!newGuidOriginal.value || !newGuidCustom.value) return
@@ -282,33 +290,44 @@ const handleAddGuid = () => {
 }
 
 onMounted(() => {
-  const savedAuth = localStorage.getItem('ch_auth')
-  if (savedAuth === 'true') {
+  const token = localStorage.getItem('ch_auth_token')
+  if (token) {
     isAuthenticated.value = true
+    fetchWhitelists()
   }
 })
 
-const handleLogin = () => {
+const handleLogin = async () => {
   isLoggingIn.value = true
   loginError.value = ''
 
-  setTimeout(() => {
-    if (
-      VALID_USERS_B64.includes(btoa(username.value.toLowerCase())) &&
-      btoa(password.value) === ADMIN_PASS_B64
-    ) {
-      isAuthenticated.value = true
-      localStorage.setItem('ch_auth', 'true')
-    } else {
-      loginError.value = 'Invalid username or password'
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username: username.value, password: password.value })
+    })
+
+    if (!response.ok) {
+      throw new Error('Invalid username or password')
     }
+
+    const data = await response.json()
+    localStorage.setItem('ch_auth_token', data.token)
+    isAuthenticated.value = true
+    fetchWhitelists()
+  } catch (err: any) {
+    loginError.value = err.message || 'Login failed'
+  } finally {
     isLoggingIn.value = false
-  }, 800)
+  }
 }
 
 const handleLogout = () => {
   isAuthenticated.value = false
-  localStorage.removeItem('ch_auth')
+  localStorage.removeItem('ch_auth_token')
   activeTab.value = 'logs'
 }
 </script>
