@@ -22,7 +22,8 @@ const fetchScreenshots = async () => {
           const ssRes = await fetch(`${API_URL}/players/${users[0].id}/fairshots`)
           if (ssRes.ok) {
             const data = await ssRes.json()
-            screenshots.value = data.map((s: any, i: number) => ({
+            const rawScreenshots = Array.isArray(data) ? data : (data.fairshots || data.screenshots || [])
+            screenshots.value = rawScreenshots.map((s: any, i: number) => ({
               id: i,
               player: filterName.value || filterGuid.value,
               guid: filterGuid.value,

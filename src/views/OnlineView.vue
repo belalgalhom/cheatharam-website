@@ -12,12 +12,13 @@ onMounted(async () => {
     const res = await fetch(`${API_URL}/players/online`)
     if (res.ok) {
       const data = await res.json()
-      players.value = data.players.map((p: any) => ({
-        id: p.clientId,
-        name: p.name,
-        guid: p.guid,
+      const rawPlayers = Array.isArray(data) ? data : (data.players || [])
+      players.value = rawPlayers.map((p: any) => ({
+        id: p.clientId || p.id || Date.now() + Math.random(),
+        name: p.name || 'Unknown',
+        guid: p.guid || 'Unknown',
         server: p.server || 'Unknown Server'
-      })) || []
+      }))
     }
   } catch (err) {
     console.error(err)
