@@ -12,7 +12,7 @@ const formatLastSeen = (dateStr: string) => {
   const date = new Date(dateStr)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
-  
+
   if (diff < 60000) return 'Just now'
   if (diff < 3600000) return `${Math.floor(diff / 60000)} minutes ago`
   if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`
@@ -25,27 +25,27 @@ const handleSearch = async () => {
   isSearching.value = true
   try {
     const query = searchQuery.value.trim()
-    
+
     // Fetch online players and search results in parallel
     const [clientNameRes, clientGuidRes, onlineRes] = await Promise.all([
       api.get(`/clients/search?name=${encodeURIComponent(query)}`),
       api.get(`/clients/search?guid=${encodeURIComponent(query)}`),
-      api.get('/players/online')
+      api.get('/players/online'),
     ])
 
     let clients: any[] = []
-    
+
     if (clientNameRes.ok) {
       const data = await clientNameRes.json()
       clients = Array.isArray(data) ? data : []
     }
-    
+
     if (clientGuidRes.ok) {
       const data = await clientGuidRes.json()
       if (Array.isArray(data)) {
         // Merge and avoid duplicates by ID
-        data.forEach(client => {
-          if (!clients.find(c => c.id === client.id)) {
+        data.forEach((client) => {
+          if (!clients.find((c) => c.id === client.id)) {
             clients.push(client)
           }
         })
@@ -60,11 +60,11 @@ const handleSearch = async () => {
     }
 
     // Map to UI internal structure
-    searchResult.value = clients.map(c => ({
-      name: c.currentName || 'Unknown Player',
+    searchResult.value = clients.map((c) => ({
+      name: c.currentName || 'UnnamedPlayer',
       guid: c.guid,
       lastSeen: formatLastSeen(c.lastSeen),
-      online: onlineGuids.includes(c.guid)
+      online: onlineGuids.includes(c.guid),
     }))
   } catch (err) {
     console.error('Search failed:', err)

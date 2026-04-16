@@ -13,12 +13,12 @@ onMounted(async () => {
     const res = await api.get('/players/online')
     if (res.ok) {
       const data = await res.json()
-      const rawPlayers = Array.isArray(data) ? data : (data.players || [])
+      const rawPlayers = Array.isArray(data) ? data : data.players || []
       players.value = rawPlayers.map((p: any) => ({
         id: p.clientId || p.id || Date.now() + Math.random(),
-        name: p.name || 'Unknown',
+        name: p.name || 'UnnamedPlayer',
         guid: p.guid || 'Unknown',
-        server: p.server || 'Unknown Server'
+        server: p.server || 'Unknown Server',
       }))
     }
   } catch (err) {
@@ -34,7 +34,9 @@ onMounted(async () => {
         <h1 class="text-4xl font-bold mb-2">Live Players</h1>
         <p class="text-slate-400">Current active players verified by the anticheat system.</p>
       </div>
-      <div class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
+      <div
+        class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/10 backdrop-blur-sm"
+      >
         <div class="flex flex-col">
           <span class="text-xs text-slate-500 uppercase font-bold">Total Players</span>
           <span class="text-2xl font-bold text-amber-500">{{ players.length }}</span>
@@ -49,7 +51,9 @@ onMounted(async () => {
 
     <div class="grid gap-4">
       <!-- Table Header -->
-      <div class="hidden md:grid grid-cols-5 px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+      <div
+        class="hidden md:grid grid-cols-5 px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-500"
+      >
         <span>Player Name</span>
         <span>Guid</span>
         <span>Connected Server</span>
@@ -58,13 +62,20 @@ onMounted(async () => {
       </div>
 
       <!-- Player Cards -->
-      <div v-for="player in players" :key="player.id"
-           class="group grid md:grid-cols-5 items-center px-8 py-6 bg-slate-800/20 border border-white/5 rounded-3xl hover:bg-slate-800/40 hover:border-amber-500/30 transition-all">
+      <div
+        v-for="player in players"
+        :key="player.id"
+        class="group grid md:grid-cols-5 items-center px-8 py-6 bg-slate-800/20 border border-white/5 rounded-3xl hover:bg-slate-800/40 hover:border-amber-500/30 transition-all"
+      >
         <div class="flex items-center gap-4 mb-4 md:mb-0">
-          <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500">
+          <div
+            class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500"
+          >
             <User class="w-5 h-5" />
           </div>
-          <span class="font-bold text-lg group-hover:text-amber-500 transition-colors">{{ player.name }}</span>
+          <span class="font-bold text-lg group-hover:text-amber-500 transition-colors">{{
+            player.name
+          }}</span>
         </div>
 
         <div class="flex items-center gap-2 text-slate-400 mb-2 md:mb-0">
@@ -78,7 +89,9 @@ onMounted(async () => {
         </div>
 
         <div class="flex justify-center">
-          <span class="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-500 text-xs font-bold rounded-full border border-emerald-500/20">
+          <span
+            class="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-500 text-xs font-bold rounded-full border border-emerald-500/20"
+          >
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             VERIFIED
           </span>
@@ -94,12 +107,17 @@ onMounted(async () => {
           </RouterLink>
         </div>
       </div>
-      
+
       <!-- Empty State -->
-      <div v-if="players.length === 0" class="col-span-full flex flex-col items-center justify-center py-20 bg-slate-800/20 border border-white/5 rounded-3xl text-center">
+      <div
+        v-if="players.length === 0"
+        class="col-span-full flex flex-col items-center justify-center py-20 bg-slate-800/20 border border-white/5 rounded-3xl text-center"
+      >
         <Server class="w-16 h-16 text-slate-600 mb-6" />
         <h2 class="text-2xl font-bold text-white mb-2">No Players Online</h2>
-        <p class="text-slate-400">There are currently no verified players connected to any monitored server.</p>
+        <p class="text-slate-400">
+          There are currently no verified players connected to any monitored server.
+        </p>
       </div>
     </div>
   </div>
