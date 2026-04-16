@@ -22,9 +22,8 @@ const isLoggingIn = ref(false)
 
 const activeTab = ref('logs')
 
-// Base64 encoded credentials to prevent plaintext exposure in repo
-const ADMIN_USER_B64 = 'YWRtaW4=' // admin
-const ADMIN_PASS_B64 = 'Y2hlYXRoYXJhbTIwMjY=' // cheatharam2026
+const VALID_USERS_B64 = ['ZGV2aWw=', 'ZHJhY3VsYQ==']
+const ADMIN_PASS_B64 = 'aGVzdGFydGVkaW5zdWx0bXlmYW1pbHlteXNoaXQ2NjY='
 
 const logs = ref([
   {
@@ -294,7 +293,10 @@ const handleLogin = () => {
   loginError.value = ''
 
   setTimeout(() => {
-    if (btoa(username.value) === ADMIN_USER_B64 && btoa(password.value) === ADMIN_PASS_B64) {
+    if (
+      VALID_USERS_B64.includes(btoa(username.value.toLowerCase())) &&
+      btoa(password.value) === ADMIN_PASS_B64
+    ) {
       isAuthenticated.value = true
       localStorage.setItem('ch_auth', 'true')
     } else {
@@ -645,9 +647,7 @@ const handleLogout = () => {
 
             <button
               type="submit"
-              :disabled="
-                isAddingWhitelist || !newWhitelistName || !newWhitelistHash
-              "
+              :disabled="isAddingWhitelist || !newWhitelistName || !newWhitelistHash"
               class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <PlusCircle v-if="!isAddingWhitelist" class="w-5 h-5" />
