@@ -27,6 +27,7 @@ import { api } from '@/utils/api'
 
 const activeTab = ref('logs')
 
+// --- Dummy Logs Data ---
 const logs = ref([
   {
     id: 1,
@@ -128,56 +129,6 @@ const logs = ref([
     details: 'Wallhack signature match',
     severity: 'high',
   },
-  {
-    id: 11,
-    time: '2026-04-15 01:58:22',
-    type: 'CVAR Attempted',
-    player: 'Ghost_Ops',
-    guid: '0x1CC253DD',
-    action: 'Blocked',
-    details: 'Attempted change to rate (He tried to do it)',
-    severity: 'medium',
-  },
-  {
-    id: 12,
-    time: '2026-04-15 01:50:10',
-    type: 'Admin Action',
-    player: 'Dracula',
-    guid: 'INTERNAL',
-    action: 'Manual Check',
-    details: 'Reviewed screenshots for GUID 0x8FA72BB3',
-    severity: 'low',
-  },
-  {
-    id: 13,
-    time: '2026-04-15 01:45:00',
-    type: 'Injection Blocked',
-    player: 'Cheater_Alt',
-    guid: '0xABCDEF01',
-    action: 'Access Denied',
-    details: 'External overlay detection',
-    severity: 'high',
-  },
-  {
-    id: 14,
-    time: '2026-04-15 01:38:15',
-    type: 'CVAR Attempted',
-    player: 'Soldier_X',
-    guid: '0x8FA72BB3',
-    action: 'Reset to Default',
-    details: 'Attempted to change g_syncronousClients',
-    severity: 'medium',
-  },
-  {
-    id: 15,
-    time: '2026-04-15 01:30:22',
-    type: 'System Boot',
-    player: 'SERVER',
-    guid: 'INTERNAL',
-    action: 'Success',
-    details: 'Anticheat engine initialized',
-    severity: 'low',
-  },
 ])
 
 const visibleLogsCount = ref(10)
@@ -189,7 +140,6 @@ const visibleLogs = computed(() => {
 
 const loadMoreLogs = () => {
   if (visibleLogsCount.value >= logs.value.length) return
-
   isLoadingMore.value = true
   setTimeout(() => {
     visibleLogsCount.value += 10
@@ -197,7 +147,9 @@ const loadMoreLogs = () => {
   }, 600)
 }
 
-// Whitelist Form State
+// ==========================================
+// WHITELIST LOGIC
+// ==========================================
 const showWhitelistForm = ref(false)
 const newWhitelistName = ref('')
 const newWhitelistHash = ref('')
@@ -211,7 +163,6 @@ const fetchWhitelists = async () => {
     if (response.ok) {
       const responseBody = await response.json()
       const items = responseBody.data || []
-
       whitelistedFiles.value = items.map((item: any) => ({
         id: item.id,
         name: item.name,
@@ -251,7 +202,21 @@ const handleAddWhitelist = async () => {
   }
 }
 
-// GUID Form State
+const deleteWhitelist = async (hash: string) => {
+  if (!confirm('Are you sure you want to remove this file from the whitelist?')) return
+  try {
+    const res = await api.delete(`/whitelists/${hash}`)
+    if (res.ok) {
+      fetchWhitelists()
+    }
+  } catch (e) {
+    console.error('Failed to delete whitelist', e)
+  }
+}
+
+// ==========================================
+// CUSTOM GUID LOGIC
+// ==========================================
 const showGuidForm = ref(false)
 const newGuidOriginal = ref('')
 const newGuidCustom = ref('')
@@ -280,7 +245,9 @@ const handleAddGuid = () => {
   }, 800)
 }
 
-// Payload State
+// ==========================================
+// PAYLOADS LOGIC
+// ==========================================
 const payloads = ref<any[]>([])
 const showPayloadForm = ref(false)
 const newPayloadUrl = ref('')
@@ -295,7 +262,6 @@ const fetchPayloads = async () => {
     const res = await api.get('/payloads')
     if (res.ok) {
       const responseBody = await res.json()
-      // Extract the array from the nested 'data' property
       payloads.value = responseBody.data || []
     }
   } catch (e) {
@@ -357,6 +323,9 @@ const deletePayload = async (id: number) => {
   }
 }
 
+// ==========================================
+// AUTHENTICATION LOGIC
+// ==========================================
 onMounted(() => {
   if (api.getToken()) {
     isAuthenticated.value = true
@@ -376,8 +345,6 @@ const handleLogin = async () => {
     if (!response.ok) throw new Error('Invalid username or password')
 
     const responseBody = await response.json()
-
-    // Access the token inside the nested 'data' object
     api.setToken(responseBody.data.token)
 
     isAuthenticated.value = true
@@ -399,7 +366,6 @@ const handleLogout = () => {
 
 <template>
   <div class="container mx-auto px-6 py-12 max-w-6xl">
-    <!-- Login Form -->
     <div v-if="!isAuthenticated" class="max-w-md mx-auto mt-20">
       <div class="text-center mb-10">
         <div
@@ -469,7 +435,6 @@ const handleLogout = () => {
       </div>
     </div>
 
-    <!-- Admin Dashboard -->
     <div v-else class="animate-fadeIn">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
@@ -490,7 +455,6 @@ const handleLogout = () => {
         </button>
       </div>
 
-      <!-- Tabs Navigation -->
       <div
         class="flex flex-wrap gap-4 mb-12 bg-slate-900/40 p-2 rounded-2xl border border-white/5 inline-flex backdrop-blur-sm"
       >
@@ -503,8 +467,7 @@ const handleLogout = () => {
               : 'text-slate-400 hover:text-white',
           ]"
         >
-          <Terminal class="w-4 h-4" />
-          System Logs
+          <Terminal class="w-4 h-4" /> System Logs
         </button>
         <button
           @click="activeTab = 'whitelist'"
@@ -515,8 +478,7 @@ const handleLogout = () => {
               : 'text-slate-400 hover:text-white',
           ]"
         >
-          <FileCode class="w-4 h-4" />
-          File Whitelist
+          <FileCode class="w-4 h-4" /> File Whitelist
         </button>
         <button
           @click="activeTab = 'guids'"
@@ -527,8 +489,7 @@ const handleLogout = () => {
               : 'text-slate-400 hover:text-white',
           ]"
         >
-          <Fingerprint class="w-4 h-4" />
-          Custom GUIDs
+          <Fingerprint class="w-4 h-4" /> Custom GUIDs
         </button>
         <button
           @click="activeTab = 'payloads'"
@@ -539,14 +500,11 @@ const handleLogout = () => {
               : 'text-slate-400 hover:text-white',
           ]"
         >
-          <Package class="w-4 h-4" />
-          Payloads
+          <Package class="w-4 h-4" /> Payloads
         </button>
       </div>
 
-      <!-- Tab: System Logs -->
       <div v-if="activeTab === 'logs'" class="space-y-12 animate-fadeIn">
-        <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div
             class="bg-slate-800/20 border border-white/5 p-8 rounded-[2rem] backdrop-blur-sm hover:border-amber-500/20 transition-all group"
@@ -600,7 +558,6 @@ const handleLogout = () => {
           </div>
         </div>
 
-        <!-- Logs Table -->
         <div
           class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl"
         >
@@ -678,7 +635,6 @@ const handleLogout = () => {
         </div>
       </div>
 
-      <!-- Tab: File Whitelist -->
       <div v-else-if="activeTab === 'whitelist'" class="animate-fadeIn">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
@@ -756,7 +712,6 @@ const handleLogout = () => {
           </form>
         </div>
 
-        <!-- Whitelisted Files Table -->
         <div
           class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl w-full"
         >
@@ -772,6 +727,9 @@ const handleLogout = () => {
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Date Added
+                  </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -791,12 +749,19 @@ const handleLogout = () => {
                       {{ file.hash }}
                     </div>
                   </td>
-                  <td class="px-8 py-6 text-sm text-slate-400">
-                    {{ file.added }}
+                  <td class="px-8 py-6 text-sm text-slate-400">{{ file.added }}</td>
+                  <td class="px-8 py-6">
+                    <button
+                      @click="deleteWhitelist(file.hash)"
+                      class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                      title="Delete"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="whitelistedFiles.length === 0">
-                  <td colspan="3" class="px-8 py-10 text-center text-slate-500 text-sm">
+                  <td colspan="4" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No whitelisted files found.
                   </td>
                 </tr>
@@ -806,7 +771,6 @@ const handleLogout = () => {
         </div>
       </div>
 
-      <!-- Tab: Custom GUIDs -->
       <div v-else-if="activeTab === 'guids'" class="animate-fadeIn">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
@@ -882,7 +846,6 @@ const handleLogout = () => {
           </form>
         </div>
 
-        <!-- Custom GUIDs Table -->
         <div
           class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl w-full"
         >
@@ -917,9 +880,7 @@ const handleLogout = () => {
                       {{ item.custom }}
                     </div>
                   </td>
-                  <td class="px-8 py-6 text-sm text-slate-400">
-                    {{ item.added }}
-                  </td>
+                  <td class="px-8 py-6 text-sm text-slate-400">{{ item.added }}</td>
                 </tr>
                 <tr v-if="customGuidsList.length === 0">
                   <td colspan="3" class="px-8 py-10 text-center text-slate-500 text-sm">
@@ -932,7 +893,6 @@ const handleLogout = () => {
         </div>
       </div>
 
-      <!-- Tab: Payloads -->
       <div v-else-if="activeTab === 'payloads'" class="animate-fadeIn space-y-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
@@ -951,7 +911,6 @@ const handleLogout = () => {
           </button>
         </div>
 
-        <!-- Success Status -->
         <div
           v-if="payloadStatus"
           class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20"
@@ -960,7 +919,6 @@ const handleLogout = () => {
           {{ payloadStatus }}
         </div>
 
-        <!-- Add Payload Form -->
         <div
           v-if="showPayloadForm"
           class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 shadow-2xl animate-fadeIn"
@@ -1035,7 +993,6 @@ const handleLogout = () => {
           </form>
         </div>
 
-        <!-- Payloads Table -->
         <div
           class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl"
         >
