@@ -105,7 +105,7 @@ const toggleZoom = (e: Event) => {
     </div>
 
     <!-- Gallery Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div v-if="screenshots.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <div v-for="(ss, index) in screenshots" :key="ss.id"
            class="group relative bg-slate-800/30 border border-white/5 rounded-[2rem] overflow-hidden hover:border-amber-500/30 transition-all">
         <!-- Image Container -->
@@ -147,6 +147,15 @@ const toggleZoom = (e: Event) => {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="screenshots.length === 0" class="flex flex-col items-center justify-center py-20 bg-slate-800/20 border border-white/5 rounded-[2rem] text-center mt-8">
+      <Camera class="w-16 h-16 text-slate-600 mb-6" />
+      <h2 class="text-2xl font-bold text-white mb-2">No Screenshots Found</h2>
+      <p class="text-slate-400">
+        {{ filterGuid ? 'This player has no uploaded fairshots on record.' : 'There are currently no screenshots available.' }}
+      </p>
     </div>
 
     <!-- Lightbox -->

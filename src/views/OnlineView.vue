@@ -93,6 +93,13 @@ onMounted(async () => {
           </RouterLink>
         </div>
       </div>
+      
+      <!-- Empty State -->
+      <div v-if="players.length === 0" class="col-span-full flex flex-col items-center justify-center py-20 bg-slate-800/20 border border-white/5 rounded-3xl text-center">
+        <Server class="w-16 h-16 text-slate-600 mb-6" />
+        <h2 class="text-2xl font-bold text-white mb-2">No Players Online</h2>
+        <p class="text-slate-400">There are currently no verified players connected to any monitored server.</p>
+      </div>
     </div>
   </div>
 </template>
