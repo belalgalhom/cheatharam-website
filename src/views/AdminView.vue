@@ -12,6 +12,9 @@ import {
   Fingerprint,
   PlusCircle,
   Check,
+  Package,
+  Trash2,
+  Star,
 } from 'lucide-vue-next'
 
 const isAuthenticated = ref(false)
@@ -21,6 +24,7 @@ const loginError = ref('')
 const isLoggingIn = ref(false)
 
 const activeTab = ref('logs')
+
 const API_URL = 'https://api.ch-sof2.online'
 
 const logs = ref([
@@ -199,16 +203,13 @@ const newWhitelistName = ref('')
 const newWhitelistHash = ref('')
 const isAddingWhitelist = ref(false)
 const whitelistStatus = ref('')
-
 const whitelistedFiles = ref<any[]>([])
 
 const fetchWhitelists = async () => {
   try {
     const token = localStorage.getItem('ch_auth_token')
     const response = await fetch(`${API_URL}/whitelists`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { 'Authorization': `Bearer ${token}` }
     })
     if (response.ok) {
       const data = await response.json()
@@ -216,47 +217,31 @@ const fetchWhitelists = async () => {
         id: item.id,
         name: item.name,
         hash: item.hash,
-        added: item.createdAt ? new Date(item.createdAt).toISOString().substring(0, 10) : new Date().toISOString().substring(0, 10),
+        added: item.createdAt ? new Date(item.createdAt).toISOString().substring(0, 10) : '',
       }))
-    } else if (response.status === 401) {
-       handleLogout()
-    }
-  } catch (e) {
-    console.error('Failed to fetch whitelists', e)
-  }
+    } else if (response.status === 401) { handleLogout() }
+  } catch (e) { console.error('Failed to fetch whitelists', e) }
 }
-
 
 const handleAddWhitelist = async () => {
   if (!newWhitelistName.value || !newWhitelistHash.value) return
   isAddingWhitelist.value = true
-
   try {
     const token = localStorage.getItem('ch_auth_token')
     const response = await fetch(`${API_URL}/whitelists`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ name: newWhitelistName.value, hash: newWhitelistHash.value })
     })
-
     if (response.ok) {
       whitelistStatus.value = `File ${newWhitelistName.value} successfully whitelisted.`
       newWhitelistName.value = ''
       newWhitelistHash.value = ''
       fetchWhitelists()
       showWhitelistForm.value = false
-      setTimeout(() => {
-        whitelistStatus.value = ''
-      }, 3000)
+      setTimeout(() => { whitelistStatus.value = '' }, 3000)
     }
-  } catch (err) {
-    console.error(err)
-  } finally {
-    isAddingWhitelist.value = false
-  }
+  } catch (err) { console.error(err) } finally { isAddingWhitelist.value = false }
 }
 
 // GUID Form State
@@ -265,7 +250,6 @@ const newGuidOriginal = ref('')
 const newGuidCustom = ref('')
 const isAddingGuid = ref(false)
 const guidStatus = ref('')
-
 const customGuidsList = ref<any[]>([])
 
 const handleAddGuid = () => {
@@ -283,10 +267,79 @@ const handleAddGuid = () => {
     newGuidCustom.value = ''
     isAddingGuid.value = false
     showGuidForm.value = false
-    setTimeout(() => {
-      guidStatus.value = ''
-    }, 3000)
+    setTimeout(() => { guidStatus.value = '' }, 3000)
   }, 800)
+}
+
+// Payload State
+const payloads = ref<any[]>([])
+const showPayloadForm = ref(false)
+const newPayloadUrl = ref('')
+const newPayloadFileName = ref('')
+const newPayloadFileHash = ref('')
+const newPayloadVersion = ref('')
+const isAddingPayload = ref(false)
+const payloadStatus = ref('')
+
+const fetchPayloads = async () => {
+  try {
+    const token = localStorage.getItem('ch_auth_token')
+    const res = await fetch(`${API_URL}/payloads`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (res.ok) payloads.value = await res.json()
+  } catch (e) { console.error(e) }
+}
+
+const handleAddPayload = async () => {
+  if (!newPayloadUrl.value || !newPayloadFileName.value || !newPayloadFileHash.value || !newPayloadVersion.value) return
+  isAddingPayload.value = true
+  try {
+    const token = localStorage.getItem('ch_auth_token')
+    const res = await fetch(`${API_URL}/payloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        url: newPayloadUrl.value,
+        fileName: newPayloadFileName.value,
+        fileHash: newPayloadFileHash.value,
+        version: newPayloadVersion.value,
+        isActive: true
+      })
+    })
+    if (res.ok) {
+      payloadStatus.value = `Payload v${newPayloadVersion.value} registered successfully.`
+      newPayloadUrl.value = ''
+      newPayloadFileName.value = ''
+      newPayloadFileHash.value = ''
+      newPayloadVersion.value = ''
+      showPayloadForm.value = false
+      fetchPayloads()
+      setTimeout(() => { payloadStatus.value = '' }, 3000)
+    }
+  } catch (e) { console.error(e) } finally { isAddingPayload.value = false }
+}
+
+const activatePayload = async (id: number) => {
+  try {
+    const token = localStorage.getItem('ch_auth_token')
+    const res = await fetch(`${API_URL}/payloads/${id}/active`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (res.ok) fetchPayloads()
+  } catch (e) { console.error(e) }
+}
+
+const deletePayload = async (id: number) => {
+  try {
+    const token = localStorage.getItem('ch_auth_token')
+    const res = await fetch(`${API_URL}/payloads/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (res.ok) fetchPayloads()
+  } catch (e) { console.error(e) }
 }
 
 onMounted(() => {
@@ -294,30 +347,25 @@ onMounted(() => {
   if (token) {
     isAuthenticated.value = true
     fetchWhitelists()
+    fetchPayloads()
   }
 })
 
 const handleLogin = async () => {
   isLoggingIn.value = true
   loginError.value = ''
-
   try {
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: username.value, password: password.value })
     })
-
-    if (!response.ok) {
-      throw new Error('Invalid username or password')
-    }
-
+    if (!response.ok) throw new Error('Invalid username or password')
     const data = await response.json()
     localStorage.setItem('ch_auth_token', data.token)
     isAuthenticated.value = true
     fetchWhitelists()
+    fetchPayloads()
   } catch (err: any) {
     loginError.value = err.message || 'Login failed'
   } finally {
@@ -464,6 +512,18 @@ const handleLogout = () => {
         >
           <Fingerprint class="w-4 h-4" />
           Custom GUIDs
+        </button>
+        <button
+          @click="activeTab = 'payloads'"
+          :class="[
+            'px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2',
+            activeTab === 'payloads'
+              ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+              : 'text-slate-400 hover:text-white',
+          ]"
+        >
+          <Package class="w-4 h-4" />
+          Payloads
         </button>
       </div>
 
@@ -848,6 +908,118 @@ const handleLogout = () => {
                   <td colspan="3" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No custom GUIDs found.
                   </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Payloads -->
+      <div v-else-if="activeTab === 'payloads'" class="animate-fadeIn space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+              <Package class="w-8 h-8 text-amber-500" />
+              Payload Manager
+            </h2>
+            <p class="text-slate-400">Manage anticheat client payloads deployed to game servers.</p>
+          </div>
+          <button
+            @click="showPayloadForm = !showPayloadForm"
+            class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+          >
+            <PlusCircle class="w-5 h-5" />
+            {{ showPayloadForm ? 'Cancel' : 'Add Payload' }}
+          </button>
+        </div>
+
+        <!-- Success Status -->
+        <div v-if="payloadStatus" class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20">
+          <Check class="w-5 h-5" />
+          {{ payloadStatus }}
+        </div>
+
+        <!-- Add Payload Form -->
+        <div v-if="showPayloadForm" class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 shadow-2xl animate-fadeIn">
+          <form @submit.prevent="handleAddPayload" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Download URL</label>
+                <input v-model="newPayloadUrl" type="url" required placeholder="https://cdn.example.com/ac-client.zip"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">File Name</label>
+                <input v-model="newPayloadFileName" type="text" required placeholder="e.g. ac-client-v2.zip"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Version</label>
+                <input v-model="newPayloadVersion" type="text" required placeholder="e.g. 2.1.0"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner" />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">SHA-256 File Hash</label>
+                <input v-model="newPayloadFileHash" type="text" required placeholder="e.g. 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a..."
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner" />
+              </div>
+            </div>
+            <button type="submit" :disabled="isAddingPayload"
+              class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed">
+              <PlusCircle v-if="!isAddingPayload" class="w-5 h-5" />
+              <span v-if="!isAddingPayload">Deploy Payload</span>
+              <span v-else class="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full"></span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Payloads Table -->
+        <div class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-white/5 border-b border-white/5">
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">File Name</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">Version</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">Hash</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">Status</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                <tr v-for="p in payloads" :key="p.id" class="hover:bg-white/5 transition-colors">
+                  <td class="px-8 py-6">
+                    <div class="font-bold text-white">{{ p.fileName }}</div>
+                    <div class="text-xs text-slate-500 font-mono mt-1 truncate max-w-[200px]">{{ p.url }}</div>
+                  </td>
+                  <td class="px-8 py-6">
+                    <span class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono">v{{ p.version }}</span>
+                  </td>
+                  <td class="px-8 py-6">
+                    <div class="text-xs text-amber-500 font-mono bg-amber-500/10 inline-block px-3 py-1 rounded-lg border border-amber-500/20 truncate max-w-[160px]">{{ p.fileHash }}</div>
+                  </td>
+                  <td class="px-8 py-6">
+                    <span v-if="p.isActive" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 w-fit">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE
+                    </span>
+                    <span v-else class="px-3 py-1 rounded-full text-xs font-black bg-slate-700/50 text-slate-400">INACTIVE</span>
+                  </td>
+                  <td class="px-8 py-6">
+                    <div class="flex items-center gap-2">
+                      <button v-if="!p.isActive" @click="activatePayload(p.id)"
+                        class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors border border-emerald-500/20" title="Set as Active">
+                        <Star class="w-4 h-4" />
+                      </button>
+                      <button @click="deletePayload(p.id)"
+                        class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20" title="Delete">
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="payloads.length === 0">
+                  <td colspan="5" class="px-8 py-10 text-center text-slate-500 text-sm">No payloads found.</td>
                 </tr>
               </tbody>
             </table>
