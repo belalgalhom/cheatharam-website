@@ -206,6 +206,23 @@ const isAddingWhitelist = ref(false)
 const whitelistStatus = ref('')
 const whitelistedFiles = ref<any[]>([])
 
+const visibleWhitelistCount = ref(10)
+const isLoadingMoreWhitelist = ref(false)
+
+const visibleWhitelists = computed(() => {
+  return whitelistedFiles.value.slice(0, visibleWhitelistCount.value)
+})
+
+const loadMoreWhitelists = () => {
+  if (visibleWhitelistCount.value >= whitelistedFiles.value.length) return
+
+  isLoadingMoreWhitelist.value = true
+  setTimeout(() => {
+    visibleWhitelistCount.value += 10
+    isLoadingMoreWhitelist.value = false
+  }, 600)
+}
+
 const fetchWhitelists = async () => {
   try {
     const response = await api.get('/whitelists')
@@ -253,6 +270,23 @@ const newGuidCustom = ref('')
 const isAddingGuid = ref(false)
 const guidStatus = ref('')
 const customGuidsList = ref<any[]>([])
+
+const visibleGuidCount = ref(10)
+const isLoadingMoreGuids = ref(false)
+
+const visibleGuids = computed(() => {
+  return customGuidsList.value.slice(0, visibleGuidCount.value)
+})
+
+const loadMoreGuids = () => {
+  if (visibleGuidCount.value >= customGuidsList.value.length) return
+
+  isLoadingMoreGuids.value = true
+  setTimeout(() => {
+    visibleGuidCount.value += 10
+    isLoadingMoreGuids.value = false
+  }, 600)
+}
 
 const fetchGuids = async () => {
   try {
@@ -808,7 +842,7 @@ const handleLogout = () => {
               </thead>
               <tbody class="divide-y divide-white/5">
                 <tr
-                  v-for="file in whitelistedFiles"
+                  v-for="file in visibleWhitelists"
                   :key="file.id"
                   class="hover:bg-white/5 transition-colors group"
                 >
@@ -842,6 +876,22 @@ const handleLogout = () => {
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div
+            v-if="visibleWhitelistCount < whitelistedFiles.length"
+            class="px-8 py-4 bg-white/5 border-t border-white/5 text-center"
+          >
+            <button
+              @click="loadMoreWhitelists"
+              :disabled="isLoadingMoreWhitelist"
+              class="text-sm font-bold text-amber-500 hover:text-amber-400 transition-colors flex items-center justify-center gap-2 mx-auto disabled:opacity-50"
+            >
+              <span
+                v-if="isLoadingMoreWhitelist"
+                class="animate-spin w-4 h-4 border-2 border-amber-500/30 border-t-amber-500 rounded-full"
+              ></span>
+              {{ isLoadingMoreWhitelist ? 'Loading...' : 'Load more files...' }}
+            </button>
           </div>
         </div>
       </div>
@@ -946,7 +996,7 @@ const handleLogout = () => {
               </thead>
               <tbody class="divide-y divide-white/5">
                 <tr
-                  v-for="item in customGuidsList"
+                  v-for="item in visibleGuids"
                   :key="item.id"
                   class="hover:bg-white/5 transition-colors group"
                 >
@@ -980,6 +1030,22 @@ const handleLogout = () => {
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div
+            v-if="visibleGuidCount < customGuidsList.length"
+            class="px-8 py-4 bg-white/5 border-t border-white/5 text-center"
+          >
+            <button
+              @click="loadMoreGuids"
+              :disabled="isLoadingMoreGuids"
+              class="text-sm font-bold text-amber-500 hover:text-amber-400 transition-colors flex items-center justify-center gap-2 mx-auto disabled:opacity-50"
+            >
+              <span
+                v-if="isLoadingMoreGuids"
+                class="animate-spin w-4 h-4 border-2 border-amber-500/30 border-t-amber-500 rounded-full"
+              ></span>
+              {{ isLoadingMoreGuids ? 'Loading...' : 'Load more mappings...' }}
+            </button>
           </div>
         </div>
       </div>
