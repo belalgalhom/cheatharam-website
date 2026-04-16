@@ -224,25 +224,58 @@ const isAddingGuid = ref(false)
 const guidStatus = ref('')
 const customGuidsList = ref<any[]>([])
 
-const handleAddGuid = () => {
+const fetchGuids = async () => {
+  try {
+    const response = await api.get('/guids')
+    if (response.ok) {
+      const responseBody = await response.json()
+      const items = responseBody.data || []
+      customGuidsList.value = items.map((item: any) => ({
+        id: item.id,
+        original: item.original_guid,
+        custom: item.custom_guid,
+        added: item.createdAt ? new Date(item.createdAt).toISOString().substring(0, 10) : '',
+      }))
+    }
+  } catch (e) {
+    console.error('Failed to fetch custom guids', e)
+  }
+}
+
+const handleAddGuid = async () => {
   if (!newGuidOriginal.value || !newGuidCustom.value) return
   isAddingGuid.value = true
-  setTimeout(() => {
-    customGuidsList.value.unshift({
-      id: Date.now(),
-      original: newGuidOriginal.value.toUpperCase(),
-      custom: newGuidCustom.value.toUpperCase(),
-      added: new Date().toISOString().substring(0, 10),
+  try {
+    const res = await api.post('/guids', {
+      originalGuid: newGuidOriginal.value.toUpperCase(),
+      customGuid: newGuidCustom.value.toUpperCase(),
     })
-    guidStatus.value = `Original GUID ${newGuidOriginal.value} mapped to ${newGuidCustom.value}.`
-    newGuidOriginal.value = ''
-    newGuidCustom.value = ''
+
+    if (res.ok) {
+      guidStatus.value = `Original GUID ${newGuidOriginal.value} mapped to ${newGuidCustom.value}.`
+      newGuidOriginal.value = ''
+      newGuidCustom.value = ''
+      fetchGuids()
+      showGuidForm.value = false
+      setTimeout(() => {
+        guidStatus.value = ''
+      }, 3000)
+    }
+  } catch (e) {
+    console.error('Failed to map GUID', e)
+  } finally {
     isAddingGuid.value = false
-    showGuidForm.value = false
-    setTimeout(() => {
-      guidStatus.value = ''
-    }, 3000)
-  }, 800)
+  }
+}
+
+const deleteGuid = async (originalGuid: string) => {
+  if (!confirm('Are you sure you want to remove this GUID mapping?')) return
+  try {
+    const res = await api.delete(`/guids/${originalGuid}`)
+    if (res.ok) fetchGuids()
+  } catch (e) {
+    console.error('Failed to delete GUID mapping', e)
+  }
 }
 
 // ==========================================
@@ -331,6 +364,7 @@ onMounted(() => {
     isAuthenticated.value = true
     fetchWhitelists()
     fetchPayloads()
+    fetchGuids()
   }
 })
 
@@ -350,6 +384,7 @@ const handleLogin = async () => {
     isAuthenticated.value = true
     fetchWhitelists()
     fetchPayloads()
+    fetchGuids()
   } catch (err: any) {
     loginError.value = err.message || 'Login failed'
   } finally {
@@ -862,6 +897,9 @@ const handleLogout = () => {
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Date Added
                   </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/5">
@@ -881,9 +919,18 @@ const handleLogout = () => {
                     </div>
                   </td>
                   <td class="px-8 py-6 text-sm text-slate-400">{{ item.added }}</td>
+                  <td class="px-8 py-6">
+                    <button
+                      @click="deleteGuid(item.original)"
+                      class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                      title="Delete Mapping"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                    </button>
+                  </td>
                 </tr>
                 <tr v-if="customGuidsList.length === 0">
-                  <td colspan="3" class="px-8 py-10 text-center text-slate-500 text-sm">
+                  <td colspan="4" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No custom GUIDs found.
                   </td>
                 </tr>
