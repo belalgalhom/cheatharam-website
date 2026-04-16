@@ -209,8 +209,10 @@ const fetchWhitelists = async () => {
   try {
     const response = await api.get('/whitelists')
     if (response.ok) {
-      const data = await response.json()
-      whitelistedFiles.value = data.map((item: any) => ({
+      const responseBody = await response.json()
+      const items = responseBody.data || []
+
+      whitelistedFiles.value = items.map((item: any) => ({
         id: item.id,
         name: item.name,
         hash: item.hash,
@@ -291,9 +293,13 @@ const payloadStatus = ref('')
 const fetchPayloads = async () => {
   try {
     const res = await api.get('/payloads')
-    if (res.ok) payloads.value = await res.json()
+    if (res.ok) {
+      const responseBody = await res.json()
+      // Extract the array from the nested 'data' property
+      payloads.value = responseBody.data || []
+    }
   } catch (e) {
-    console.error(e)
+    console.error('Failed to fetch payloads', e)
   }
 }
 
