@@ -989,7 +989,6 @@ const handleLogout = () => {
                   type="text"
                   required
                   placeholder="e.g. ADMIN1"
-                  maxlength="6"
                   class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-3 px-4 text-white font-mono text-sm tracking-wider focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>
