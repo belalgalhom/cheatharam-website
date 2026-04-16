@@ -2,14 +2,15 @@
 import { ref } from 'vue'
 import { Server, User, Hash, Camera } from 'lucide-vue-next'
 
-const API_URL = 'https://api.ch-sof2.online'
+import { api } from '@/utils/api'
+
 const players = ref<any[]>([])
 
 import { onMounted } from 'vue'
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_URL}/players/online`)
+    const res = await api.get('/players/online')
     if (res.ok) {
       const data = await res.json()
       const rawPlayers = Array.isArray(data) ? data : (data.players || [])

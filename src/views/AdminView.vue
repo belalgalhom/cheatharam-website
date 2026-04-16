@@ -23,9 +23,9 @@ const password = ref('')
 const loginError = ref('')
 const isLoggingIn = ref(false)
 
-const activeTab = ref('logs')
+import { api } from '@/utils/api'
 
-const API_URL = 'https://api.ch-sof2.online'
+const activeTab = ref('logs')
 
 const logs = ref([
   {
@@ -207,10 +207,7 @@ const whitelistedFiles = ref<any[]>([])
 
 const fetchWhitelists = async () => {
   try {
-    const token = localStorage.getItem('ch_auth_token')
-    const response = await fetch(`${API_URL}/whitelists`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const response = await api.get('/whitelists')
     if (response.ok) {
       const data = await response.json()
       whitelistedFiles.value = data.map((item: any) => ({
@@ -227,12 +224,7 @@ const handleAddWhitelist = async () => {
   if (!newWhitelistName.value || !newWhitelistHash.value) return
   isAddingWhitelist.value = true
   try {
-    const token = localStorage.getItem('ch_auth_token')
-    const response = await fetch(`${API_URL}/whitelists`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ name: newWhitelistName.value, hash: newWhitelistHash.value })
-    })
+    const response = await api.post('/whitelists', { name: newWhitelistName.value, hash: newWhitelistHash.value })
     if (response.ok) {
       whitelistStatus.value = `File ${newWhitelistName.value} successfully whitelisted.`
       newWhitelistName.value = ''
@@ -283,10 +275,7 @@ const payloadStatus = ref('')
 
 const fetchPayloads = async () => {
   try {
-    const token = localStorage.getItem('ch_auth_token')
-    const res = await fetch(`${API_URL}/payloads`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const res = await api.get('/payloads')
     if (res.ok) payloads.value = await res.json()
   } catch (e) { console.error(e) }
 }
@@ -295,17 +284,12 @@ const handleAddPayload = async () => {
   if (!newPayloadUrl.value || !newPayloadFileName.value || !newPayloadFileHash.value || !newPayloadVersion.value) return
   isAddingPayload.value = true
   try {
-    const token = localStorage.getItem('ch_auth_token')
-    const res = await fetch(`${API_URL}/payloads`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({
-        url: newPayloadUrl.value,
-        fileName: newPayloadFileName.value,
-        fileHash: newPayloadFileHash.value,
-        version: newPayloadVersion.value,
-        isActive: true
-      })
+    const res = await api.post('/payloads', {
+      url: newPayloadUrl.value,
+      fileName: newPayloadFileName.value,
+      fileHash: newPayloadFileHash.value,
+      version: newPayloadVersion.value,
+      isActive: true
     })
     if (res.ok) {
       payloadStatus.value = `Payload v${newPayloadVersion.value} registered successfully.`
@@ -322,29 +306,20 @@ const handleAddPayload = async () => {
 
 const activatePayload = async (id: number) => {
   try {
-    const token = localStorage.getItem('ch_auth_token')
-    const res = await fetch(`${API_URL}/payloads/${id}/active`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const res = await api.put(`/payloads/${id}/active`)
     if (res.ok) fetchPayloads()
   } catch (e) { console.error(e) }
 }
 
 const deletePayload = async (id: number) => {
   try {
-    const token = localStorage.getItem('ch_auth_token')
-    const res = await fetch(`${API_URL}/payloads/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const res = await api.delete(`/payloads/${id}`)
     if (res.ok) fetchPayloads()
   } catch (e) { console.error(e) }
 }
 
 onMounted(() => {
-  const token = localStorage.getItem('ch_auth_token')
-  if (token) {
+  if (api.getToken()) {
     isAuthenticated.value = true
     fetchWhitelists()
     fetchPayloads()
@@ -355,14 +330,10 @@ const handleLogin = async () => {
   isLoggingIn.value = true
   loginError.value = ''
   try {
-    const response = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, password: password.value })
-    })
+    const response = await api.post('/login', { username: username.value, password: password.value })
     if (!response.ok) throw new Error('Invalid username or password')
     const data = await response.json()
-    localStorage.setItem('ch_auth_token', data.token)
+    api.setToken(data.token)
     isAuthenticated.value = true
     fetchWhitelists()
     fetchPayloads()
@@ -375,7 +346,7 @@ const handleLogin = async () => {
 
 const handleLogout = () => {
   isAuthenticated.value = false
-  localStorage.removeItem('ch_auth_token')
+  api.clearToken()
   activeTab.value = 'logs'
 }
 </script>

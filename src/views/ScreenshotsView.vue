@@ -7,7 +7,8 @@ const route = useRoute()
 const filterGuid = computed(() => route.query.guid as string | undefined)
 const filterName = computed(() => route.query.name as string | undefined)
 
-const API_URL = 'https://api.ch-sof2.online'
+import { api } from '@/utils/api'
+
 const screenshots = ref<any[]>([])
 
 import { onMounted } from 'vue'
@@ -15,11 +16,11 @@ import { onMounted } from 'vue'
 const fetchScreenshots = async () => {
   if (filterGuid.value) {
     try {
-      const searchRes = await fetch(`${API_URL}/clients/search?guid=${filterGuid.value}`)
+      const searchRes = await api.get(`/clients/search?guid=${filterGuid.value}`)
       if (searchRes.ok) {
         const users = await searchRes.json()
         if (users.length > 0) {
-          const ssRes = await fetch(`${API_URL}/players/${users[0].id}/fairshots`)
+          const ssRes = await api.get(`/players/${users[0].id}/fairshots`)
           if (ssRes.ok) {
             const data = await ssRes.json()
             const rawScreenshots = Array.isArray(data) ? data : (data.fairshots || data.screenshots || [])
