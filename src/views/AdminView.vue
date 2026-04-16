@@ -931,7 +931,7 @@ const handleLogout = () => {
                   type="text"
                   required
                   placeholder="e.g. 0x8FA72BB3"
-                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono uppercase focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-3 px-4 text-white font-mono text-sm uppercase tracking-wider focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>
               <div>
@@ -944,7 +944,7 @@ const handleLogout = () => {
                   type="text"
                   required
                   placeholder="e.g. 0xADMIN123"
-                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono uppercase focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-3 px-4 text-white font-mono text-sm uppercase tracking-wider focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>
             </div>
