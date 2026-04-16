@@ -221,6 +221,15 @@ const fetchWhitelists = async () => {
   } catch (e) { console.error('Failed to fetch whitelists', e) }
 }
 
+const deleteWhitelist = async (hash: string) => {
+  try {
+    const response = await api.delete(`/whitelists/${hash}`)
+    if (response.ok) {
+      fetchWhitelists()
+    }
+  } catch (e) { console.error('Failed to delete whitelist entry', e) }
+}
+
 const handleAddWhitelist = async () => {
   if (!newWhitelistName.value || !newWhitelistHash.value) return
   isAddingWhitelist.value = true
@@ -245,23 +254,47 @@ const isAddingGuid = ref(false)
 const guidStatus = ref('')
 const customGuidsList = ref<any[]>([])
 
-const handleAddGuid = () => {
+const fetchGuids = async () => {
+  try {
+    const response = await api.get('/guids')
+    if (response.ok) {
+      const data = await response.json()
+      customGuidsList.value = data.map((item: any) => ({
+        id: item.id,
+        original: item.original_guid,
+        custom: item.custom_guid,
+        added: item.createdAt ? new Date(item.createdAt).toISOString().substring(0, 10) : '',
+      }))
+    }
+  } catch (e) { console.error('Failed to fetch GUIDs', e) }
+}
+
+const handleAddGuid = async () => {
   if (!newGuidOriginal.value || !newGuidCustom.value) return
   isAddingGuid.value = true
-  setTimeout(() => {
-    customGuidsList.value.unshift({
-      id: Date.now(),
-      original: newGuidOriginal.value.toUpperCase(),
-      custom: newGuidCustom.value.toUpperCase(),
-      added: new Date().toISOString().substring(0, 10),
+  try {
+    const response = await api.post('/guids', {
+      originalGuid: newGuidOriginal.value.toUpperCase(),
+      customGuid: newGuidCustom.value.toUpperCase()
     })
-    guidStatus.value = `Original GUID ${newGuidOriginal.value} mapped to ${newGuidCustom.value}.`
-    newGuidOriginal.value = ''
-    newGuidCustom.value = ''
-    isAddingGuid.value = false
-    showGuidForm.value = false
-    setTimeout(() => { guidStatus.value = '' }, 3000)
-  }, 800)
+    if (response.ok) {
+      guidStatus.value = `Original GUID ${newGuidOriginal.value} mapped to ${newGuidCustom.value}.`
+      newGuidOriginal.value = ''
+      newGuidCustom.value = ''
+      fetchGuids()
+      showGuidForm.value = false
+      setTimeout(() => { guidStatus.value = '' }, 3000)
+    }
+  } catch (err) { console.error(err) } finally { isAddingGuid.value = false }
+}
+
+const deleteGuid = async (originalGuid: string) => {
+  try {
+    const response = await api.delete(`/guids/${originalGuid}`)
+    if (response.ok) {
+      fetchGuids()
+    }
+  } catch (e) { console.error('Failed to delete GUID mapping', e) }
 }
 
 // Payload State
@@ -361,6 +394,7 @@ onMounted(() => {
   if (api.getToken()) {
     isAuthenticated.value = true
     fetchWhitelists()
+    fetchGuids()
     fetchPayloads()
   }
 })
@@ -375,6 +409,7 @@ const handleLogin = async () => {
     api.setToken(data.token)
     isAuthenticated.value = true
     fetchWhitelists()
+    fetchGuids()
     fetchPayloads()
   } catch (err: any) {
     loginError.value = err.message || 'Login failed'
@@ -766,6 +801,9 @@ const handleLogout = () => {
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Date Added
                   </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/5">
@@ -787,9 +825,18 @@ const handleLogout = () => {
                   <td class="px-8 py-6 text-sm text-slate-400">
                     {{ file.added }}
                   </td>
+                  <td class="px-8 py-6">
+                    <button
+                      @click="deleteWhitelist(file.hash)"
+                      class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                      title="Delete"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                    </button>
+                  </td>
                 </tr>
                 <tr v-if="whitelistedFiles.length === 0">
-                  <td colspan="3" class="px-8 py-10 text-center text-slate-500 text-sm">
+                  <td colspan="4" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No whitelisted files found.
                   </td>
                 </tr>
@@ -892,6 +939,9 @@ const handleLogout = () => {
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Date Added
                   </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/5">
@@ -913,9 +963,18 @@ const handleLogout = () => {
                   <td class="px-8 py-6 text-sm text-slate-400">
                     {{ item.added }}
                   </td>
+                  <td class="px-8 py-6">
+                    <button
+                      @click="deleteGuid(item.original)"
+                      class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                      title="Delete"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                    </button>
+                  </td>
                 </tr>
                 <tr v-if="customGuidsList.length === 0">
-                  <td colspan="3" class="px-8 py-10 text-center text-slate-500 text-sm">
+                  <td colspan="4" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No custom GUIDs found.
                   </td>
                 </tr>
