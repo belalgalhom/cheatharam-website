@@ -34,7 +34,7 @@ const logs = ref([
     time: '2026-04-15 02:45:12',
     type: 'Cheat Detected',
     player: 'hacker_pro',
-    guid: '0xDEADBEEF',
+    guid: 'DEADBE',
     action: 'Connection Closed',
     details: 'CVAR: cg_draw2d attempted change to 0',
     severity: 'high',
@@ -44,7 +44,7 @@ const logs = ref([
     time: '2026-04-15 02:40:05',
     type: 'Screenshot Taken',
     player: 'Soldier_X',
-    guid: '0x8FA72BB3',
+    guid: '8FA72B',
     action: 'Stored for Review',
     details: 'Triggered by @ch_fs',
     severity: 'low',
@@ -54,7 +54,7 @@ const logs = ref([
     time: '2026-04-15 02:38:12',
     type: 'Injection Blocked',
     player: 'Ghost_Ops',
-    guid: '0x1CC253DD',
+    guid: '1CC253',
     action: 'Process Terminated',
     details: 'Unauthorized DLL access',
     severity: 'medium',
@@ -64,7 +64,7 @@ const logs = ref([
     time: '2026-04-15 02:35:10',
     type: 'CVAR Attempted',
     player: 'Noob_01',
-    guid: '0x7E3310FF',
+    guid: '7E3310',
     action: 'Blocked',
     details: 'Tried to change cg_fov to 150 (He tried to do it)',
     severity: 'medium',
@@ -84,7 +84,7 @@ const logs = ref([
     time: '2026-04-15 02:28:19',
     type: 'CVAR Attempted',
     player: 'Recruit_99',
-    guid: '0xA2B3C4D5',
+    guid: 'A2B3C4',
     action: 'Reset to Default',
     details: 'Attempted to force cl_maxpackets below 30',
     severity: 'medium',
@@ -94,7 +94,7 @@ const logs = ref([
     time: '2026-04-15 02:22:04',
     type: 'Screenshot Taken',
     player: 'TriggerHappy',
-    guid: '0x99B210AA',
+    guid: '99B210',
     action: 'Stored for Review',
     details: 'Automated interval check',
     severity: 'low',
@@ -104,7 +104,7 @@ const logs = ref([
     time: '2026-04-15 02:15:30',
     type: 'HWID Match',
     player: 'FlaggedUser_22',
-    guid: '0x11223344',
+    guid: '112233',
     action: 'Connection Refused',
     details: 'Previous security violation record found',
     severity: 'high',
@@ -114,7 +114,7 @@ const logs = ref([
     time: '2026-04-15 02:11:12',
     type: 'Script Error',
     player: 'Silent_Dagger',
-    guid: '0x7E3310FF',
+    guid: '7E3310',
     action: 'Logged',
     details: 'Corrupted game script detected in memory',
     severity: 'medium',
@@ -124,7 +124,7 @@ const logs = ref([
     time: '2026-04-15 02:05:45',
     type: 'Cheat Detected',
     player: 'unknown_00',
-    guid: '0x66778899',
+    guid: '667788',
     action: 'Connection Closed',
     details: 'Wallhack signature match',
     severity: 'high',
@@ -134,7 +134,7 @@ const logs = ref([
     time: '2026-04-15 01:58:22',
     type: 'CVAR Attempted',
     player: 'Ghost_Ops',
-    guid: '0x1CC253DD',
+    guid: '1CC253',
     action: 'Blocked',
     details: 'Attempted change to rate (He tried to do it)',
     severity: 'medium',
@@ -146,7 +146,7 @@ const logs = ref([
     player: 'Dracula',
     guid: 'INTERNAL',
     action: 'Manual Check',
-    details: 'Reviewed screenshots for GUID 0x8FA72BB3',
+    details: 'Reviewed screenshots for GUID 8FA72B', // Fixed here too
     severity: 'low',
   },
   {
@@ -154,7 +154,7 @@ const logs = ref([
     time: '2026-04-15 01:45:00',
     type: 'Injection Blocked',
     player: 'Cheater_Alt',
-    guid: '0xABCDEF01',
+    guid: 'ABCDEF',
     action: 'Access Denied',
     details: 'External overlay detection',
     severity: 'high',
@@ -164,7 +164,7 @@ const logs = ref([
     time: '2026-04-15 01:38:15',
     type: 'CVAR Attempted',
     player: 'Soldier_X',
-    guid: '0x8FA72BB3',
+    guid: '8FA72B',
     action: 'Reset to Default',
     details: 'Attempted to change g_syncronousClients',
     severity: 'medium',
@@ -930,7 +930,8 @@ const handleLogout = () => {
                   v-model="newGuidOriginal"
                   type="text"
                   required
-                  placeholder="e.g. 0x8FA72BB3"
+                  placeholder="e.g. 8FA72B"
+                  maxlength="6"
                   class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-3 px-4 text-white font-mono text-sm uppercase tracking-wider focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>
@@ -943,7 +944,8 @@ const handleLogout = () => {
                   v-model="newGuidCustom"
                   type="text"
                   required
-                  placeholder="e.g. 0xADMIN123"
+                  placeholder="e.g. ADMIN1"
+                  maxlength="6"
                   class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-3 px-4 text-white font-mono text-sm uppercase tracking-wider focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>

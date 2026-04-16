@@ -7,11 +7,11 @@ const searchResult = ref<any[] | null>(null)
 const isSearching = ref(false)
 
 const allPlayers = [
-  { name: 'Soldier_X', guid: '0x8FA72BB3', lastSeen: '2 minutes ago', online: true },
-  { name: 'Ghost_Ops', guid: '0x1CC253DD', lastSeen: '5 hours ago', online: false },
-  { name: 'TriggerHappy', guid: '0x99B210AA', lastSeen: 'Just now', online: true },
-  { name: 'Cheater_99', guid: '0xDEADBEEF', lastSeen: '3 days ago', online: false },
-  { name: 'Silent_Dagger', guid: '0x7E3310FF', lastSeen: '1 day ago', online: false },
+  { name: 'Soldier_X', guid: '8FA72B', lastSeen: '2 minutes ago', online: true },
+  { name: 'Ghost_Ops', guid: '1CC253', lastSeen: '5 hours ago', online: false },
+  { name: 'TriggerHappy', guid: '99B210', lastSeen: 'Just now', online: true },
+  { name: 'Cheater_99', guid: 'DEADBE', lastSeen: '3 days ago', online: false },
+  { name: 'Silent_Dagger', guid: '7E3310', lastSeen: '1 day ago', online: false },
 ]
 
 const handleSearch = () => {
