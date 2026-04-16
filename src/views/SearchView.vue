@@ -1,30 +1,77 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Search, Hash, User, Camera, AlertCircle } from 'lucide-vue-next'
+import { api } from '@/utils/api'
 
 const searchQuery = ref('')
 const searchResult = ref<any[] | null>(null)
 const isSearching = ref(false)
 
-const allPlayers = [
-  { name: 'Soldier_X', guid: '8FA72B', lastSeen: '2 minutes ago', online: true },
-  { name: 'Ghost_Ops', guid: '1CC253', lastSeen: '5 hours ago', online: false },
-  { name: 'TriggerHappy', guid: '99B210', lastSeen: 'Just now', online: true },
-  { name: 'Cheater_99', guid: 'DEADBE', lastSeen: '3 days ago', online: false },
-  { name: 'Silent_Dagger', guid: '7E3310', lastSeen: '1 day ago', online: false },
-]
+const formatLastSeen = (dateStr: string) => {
+  if (!dateStr) return 'Unknown'
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  
+  if (diff < 60000) return 'Just now'
+  if (diff < 3600000) return `${Math.floor(diff / 60000)} minutes ago`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`
+  return `${Math.floor(diff / 86400000)} days ago`
+}
 
-const handleSearch = () => {
+const handleSearch = async () => {
   if (!searchQuery.value) return
 
   isSearching.value = true
-  setTimeout(() => {
-    const query = searchQuery.value.toLowerCase()
-    searchResult.value = allPlayers.filter(
-      (p) => p.name.toLowerCase().includes(query) || p.guid.toLowerCase().includes(query),
-    )
+  try {
+    const query = searchQuery.value.trim()
+    
+    // Fetch online players and search results in parallel
+    const [clientNameRes, clientGuidRes, onlineRes] = await Promise.all([
+      api.get(`/clients/search?name=${encodeURIComponent(query)}`),
+      api.get(`/clients/search?guid=${encodeURIComponent(query)}`),
+      api.get('/players/online')
+    ])
+
+    let clients: any[] = []
+    
+    if (clientNameRes.ok) {
+      const data = await clientNameRes.json()
+      clients = Array.isArray(data) ? data : []
+    }
+    
+    if (clientGuidRes.ok) {
+      const data = await clientGuidRes.json()
+      if (Array.isArray(data)) {
+        // Merge and avoid duplicates by ID
+        data.forEach(client => {
+          if (!clients.find(c => c.id === client.id)) {
+            clients.push(client)
+          }
+        })
+      }
+    }
+
+    let onlineGuids: string[] = []
+    if (onlineRes.ok) {
+      const data = await onlineRes.json()
+      const onlinePlayers = (data && data.players) || []
+      onlineGuids = onlinePlayers.map((p: any) => p.guid)
+    }
+
+    // Map to UI internal structure
+    searchResult.value = clients.map(c => ({
+      name: c.currentName || 'Unknown Player',
+      guid: c.guid,
+      lastSeen: formatLastSeen(c.lastSeen),
+      online: onlineGuids.includes(c.guid)
+    }))
+  } catch (err) {
+    console.error('Search failed:', err)
+    searchResult.value = []
+  } finally {
     isSearching.value = false
-  }, 600)
+  }
 }
 </script>
 
