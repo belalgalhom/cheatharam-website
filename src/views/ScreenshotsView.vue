@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Camera, User, Hash, Maximize2, Download, ArrowLeft } from 'lucide-vue-next'
+import { Camera, User, Hash, Maximize2, Download, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X } from 'lucide-vue-next'
 
 const route = useRoute()
 const filterGuid = computed(() => route.query.guid as string | undefined)
@@ -24,14 +24,38 @@ const screenshots = computed(() => {
   return allScreenshots
 })
 
-const selectedImage = ref<string | null>(null)
+const selectedIndex = ref<number | null>(null)
+const isZoomed = ref(false)
 
-const openLightbox = (url: string) => {
-  selectedImage.value = url
+const openLightbox = (index: number) => {
+  selectedIndex.value = index
+  isZoomed.value = false
 }
 
 const closeLightbox = () => {
-  selectedImage.value = null
+  selectedIndex.value = null
+  isZoomed.value = false
+}
+
+const nextImage = (e: Event) => {
+  e.stopPropagation()
+  if (selectedIndex.value !== null) {
+    selectedIndex.value = (selectedIndex.value + 1) % screenshots.value.length
+    isZoomed.value = false
+  }
+}
+
+const prevImage = (e: Event) => {
+  e.stopPropagation()
+  if (selectedIndex.value !== null) {
+    selectedIndex.value = (selectedIndex.value - 1 + screenshots.value.length) % screenshots.value.length
+    isZoomed.value = false
+  }
+}
+
+const toggleZoom = (e: Event) => {
+  e.stopPropagation()
+  isZoomed.value = !isZoomed.value
 }
 </script>
 
@@ -63,17 +87,17 @@ const closeLightbox = () => {
 
     <!-- Gallery Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div v-for="ss in screenshots" :key="ss.id" 
+      <div v-for="(ss, index) in screenshots" :key="ss.id" 
            class="group relative bg-slate-800/30 border border-white/5 rounded-[2rem] overflow-hidden hover:border-amber-500/30 transition-all">
         <!-- Image Container -->
-        <div class="relative aspect-video overflow-hidden">
+        <div class="relative aspect-video overflow-hidden border-b border-white/5">
           <img :src="ss.url" :alt="`Screenshot by ${ss.player}`" 
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           
           <!-- Hover Overlay -->
           <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-            <button @click="openLightbox(ss.url)" 
+            <button @click="openLightbox(index)" 
                     class="p-4 bg-amber-500 text-black rounded-full hover:scale-110 transition-transform shadow-xl">
               <Maximize2 class="w-6 h-6" />
             </button>
@@ -108,13 +132,50 @@ const closeLightbox = () => {
 
     <!-- Lightbox -->
     <Teleport to="body">
-      <div v-if="selectedImage" 
+      <div v-if="selectedIndex !== null" 
            @click="closeLightbox"
-           class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6 cursor-zoom-out">
-        <img :src="selectedImage" alt="Enlarged screenshot" class="max-w-full max-h-full rounded-2xl shadow-2xl border border-white/10" />
-        <button class="absolute top-8 right-8 text-white/50 hover:text-white transition-colors">
-          <Maximize2 class="w-10 h-10 rotate-45" />
+           class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex items-center justify-center overscroll-none transition-all duration-300"
+           :class="isZoomed ? 'overflow-auto' : 'overflow-hidden p-6'">
+        
+        <!-- Top right controls -->
+        <div class="fixed top-8 right-8 flex items-center gap-4 z-[110]">
+          <button @click="toggleZoom" class="p-3 bg-white/10 text-white rounded-xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md shadow-2xl">
+            <ZoomOut v-if="isZoomed" class="w-6 h-6" />
+            <ZoomIn v-else class="w-6 h-6" />
+          </button>
+          <button @click="closeLightbox" class="p-3 bg-white/10 text-white rounded-xl hover:bg-red-500 hover:text-white transition-colors backdrop-blur-md shadow-2xl">
+            <X class="w-6 h-6" />
+          </button>
+        </div>
+
+        <!-- Previous navigation -->
+        <button @click="prevImage" v-if="screenshots.length > 1" 
+                class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 bg-white/5 text-white rounded-2xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md z-[110] shadow-2xl group">
+          <ChevronLeft class="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
         </button>
+
+        <!-- Next navigation -->
+        <button @click="nextImage" v-if="screenshots.length > 1" 
+                class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 bg-white/5 text-white rounded-2xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md z-[110] shadow-2xl group">
+          <ChevronRight class="w-8 h-8 group-hover:translate-x-1 transition-transform" />
+        </button>
+
+        <!-- Dynamic Image Wrapper -->
+        <div class="w-full h-full flex flex-col transition-all duration-500" 
+             :class="isZoomed ? 'items-start justify-start p-10' : 'items-center justify-center p-6'">
+          <img :src="screenshots[selectedIndex!]?.url" 
+               @click.stop="toggleZoom"
+               alt="Enlarged screenshot" 
+               class="shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 transition-all duration-500 origin-center shrink-0"
+               :class="isZoomed ? 'min-w-[150vw] cursor-zoom-out rounded-xl' : 'max-w-full max-h-[85vh] object-contain cursor-zoom-in rounded-2xl'" />
+               
+          <div v-if="!isZoomed" @click.stop class="mt-6 flex items-center gap-3 bg-white/5 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 text-white shadow-2xl z-[105]">
+            <User class="w-4 h-4 text-amber-500" />
+            <span class="font-bold tracking-wide">{{ screenshots[selectedIndex!]?.player }}</span>
+            <span class="text-slate-400 text-xs font-mono pl-3 border-l border-white/20">{{ screenshots[selectedIndex!]?.guid }}</span>
+            <span class="text-slate-500 text-xs font-bold pl-3 border-l border-white/20">{{ screenshots[selectedIndex!]?.date }}</span>
+          </div>
+        </div>
       </div>
     </Teleport>
   </div>

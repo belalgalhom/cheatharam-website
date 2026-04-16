@@ -40,9 +40,9 @@ const router = createRouter({
       component: () => import('../views/PrivacyView.vue'),
     },
     {
-      path: '/logs',
-      name: 'logs',
-      component: () => import('../views/LogsView.vue'),
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminView.vue'),
     },
   ],
 })

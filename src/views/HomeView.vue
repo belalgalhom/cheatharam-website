@@ -5,11 +5,9 @@ import { User, Server, ShieldCheck, Download, Users, Camera } from 'lucide-vue-n
 const developers = [
   {
     name: 'Dracula',
-    role: 'Lead Developer',
   },
   {
     name: 'Devil',
-    role: 'Security Researcher',
   },
 ]
 </script>
@@ -77,9 +75,6 @@ const developers = [
             </div>
             <div>
               <h3 class="text-xl font-bold">{{ dev.name }}</h3>
-              <p class="text-amber-500 text-sm font-medium uppercase tracking-wider">
-                {{ dev.role }}
-              </p>
             </div>
           </div>
         </div>
