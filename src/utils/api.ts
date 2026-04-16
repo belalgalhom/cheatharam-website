@@ -12,8 +12,7 @@ export const api = {
     }
 
     if (options.body && options.body instanceof FormData) {
-      // Browser automatically sets Content-Type with boundary for FormData
-    } else if (!headers['Content-Type']) {
+    } else if (options.body && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json'
     }
 
