@@ -30,16 +30,6 @@ const router = createRouter({
       component: () => import('../views/DownloadView.vue'),
     },
     {
-      path: '/terms',
-      name: 'terms',
-      component: () => import('../views/TermsView.vue'),
-    },
-    {
-      path: '/privacy',
-      name: 'privacy',
-      component: () => import('../views/PrivacyView.vue'),
-    },
-    {
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminView.vue'),
@@ -60,8 +50,6 @@ router.beforeEach((to, from) => {
     search: 'Player Search',
     screenshots: 'Screenshots',
     download: 'Download',
-    terms: 'Terms of Service',
-    privacy: 'Privacy Policy',
     admin: 'Admin Control Panel'
   }
   

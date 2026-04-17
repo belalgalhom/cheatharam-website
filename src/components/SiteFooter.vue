@@ -63,16 +63,6 @@ import { Shield } from 'lucide-vue-next'
                 >Download</RouterLink
               >
             </li>
-            <li>
-              <RouterLink to="/terms" class="text-slate-500 hover:text-amber-500 transition-colors"
-                >Terms of Service</RouterLink
-              >
-            </li>
-            <li>
-              <RouterLink to="/privacy" class="text-slate-500 hover:text-amber-500 transition-colors"
-                >Privacy Policy</RouterLink
-              >
-            </li>
 
           </ul>
         </div>
@@ -84,8 +74,6 @@ import { Shield } from 'lucide-vue-next'
       >
         <p>© 2026 CheatHaram Anticheat System.</p>
         <div class="flex items-center gap-6">
-          <RouterLink to="/terms" class="hover:text-amber-500 transition-colors">Terms of Service</RouterLink>
-          <RouterLink to="/privacy" class="hover:text-amber-500 transition-colors">Privacy Policy</RouterLink>
         </div>
         <p>Developed by Dracula &amp; Devil.</p>
       </div>
