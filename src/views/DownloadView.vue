@@ -40,7 +40,7 @@ const features = [
           </div>
           <div class="flex items-center gap-2">
             <div class="w-1 h-1 bg-slate-600 rounded-full"></div>
-            Size: 4.2 MB
+            Size: 1.10 MB
           </div>
         </div>
       </div>
