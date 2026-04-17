@@ -82,22 +82,22 @@ const toggleZoom = (e: Event) => {
 <template>
   <div class="container mx-auto px-6 py-12">
     <!-- Filter Banner -->
-    <div v-if="filterGuid" class="flex items-center justify-between mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
-      <div class="flex items-center gap-3">
+    <div v-if="filterGuid" class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl gap-4">
+      <div class="flex flex-wrap items-center gap-3">
         <Camera class="w-5 h-5 text-amber-500" />
-        <span class="text-amber-400 font-bold">Showing screenshots for: <span class="text-white">{{ filterName || filterGuid }}</span></span>
-        <code class="text-xs text-slate-400 font-mono bg-black/30 px-2 py-1 rounded">{{ filterGuid }}</code>
+        <span class="text-amber-400 font-bold text-sm md:text-base">Results for: <span class="text-white">{{ filterName || filterGuid }}</span></span>
+        <code class="text-[10px] text-slate-400 font-mono bg-black/30 px-2 py-1 rounded">{{ filterGuid }}</code>
       </div>
-      <RouterLink to="/screenshots" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-bold">
+      <RouterLink to="/screenshots" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-xs md:text-sm font-bold">
         <ArrowLeft class="w-4 h-4" />
-        All Screenshots
+        Clear Filter
       </RouterLink>
     </div>
 
     <div class="flex items-center justify-between mb-12">
       <div>
-        <h1 class="text-4xl font-bold mb-2">{{ filterGuid ? `${filterName || filterGuid}'s Screenshots` : 'Player Screenshots' }}</h1>
-        <p class="text-slate-400">{{ filterGuid ? `${screenshots.length} screenshot(s) found for this player.` : 'Automated captures from protected game sessions.' }}</p>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ filterGuid ? 'Player Gallery' : 'Fairshots' }}</h1>
+        <p class="text-slate-400 text-sm md:text-base">{{ filterGuid ? `${screenshots.length} screenshot(s) found.` : 'Automated captures from protected game sessions.' }}</p>
       </div>
       <div v-if="!filterGuid" class="hidden md:flex items-center gap-2 text-amber-500 bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20">
         <Camera class="w-5 h-5" />
@@ -106,7 +106,7 @@ const toggleZoom = (e: Event) => {
     </div>
 
     <!-- Gallery Grid -->
-    <div v-if="screenshots.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div v-if="screenshots.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       <div v-for="(ss, index) in screenshots" :key="ss.id"
            class="group relative bg-slate-800/30 border border-white/5 rounded-[2rem] overflow-hidden hover:border-amber-500/30 transition-all">
         <!-- Image Container -->

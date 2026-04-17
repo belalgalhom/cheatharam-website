@@ -520,7 +520,7 @@ const handleLogout = () => {
       </div>
 
       <div
-        class="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-10 shadow-2xl"
+        class="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 shadow-2xl"
       >
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div>
@@ -581,11 +581,11 @@ const handleLogout = () => {
     <div v-else class="animate-fadeIn">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 class="text-4xl font-bold text-white mb-2 flex items-center gap-4">
-            <ShieldAlert class="w-10 h-10 text-amber-500" />
-            Admin Control Panel
+          <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-4">
+            <ShieldAlert class="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
+            Admin Panel
           </h1>
-          <p class="text-slate-400">
+          <p class="text-slate-400 text-sm md:text-base">
             System surveillance, whitelist management, and security overrides.
           </p>
         </div>
@@ -600,12 +600,12 @@ const handleLogout = () => {
 
       <!-- Tabs Navigation -->
       <div
-        class="flex flex-wrap gap-4 mb-12 bg-slate-900/40 p-2 rounded-2xl border border-white/5 inline-flex backdrop-blur-sm"
+        class="flex overflow-x-auto no-scrollbar gap-2 md:gap-4 mb-8 md:mb-12 bg-slate-900/40 p-2 rounded-2xl border border-white/5 backdrop-blur-sm"
       >
         <button
           @click="activeTab = 'logs'"
           :class="[
-            'px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2',
+            'px-4 md:px-6 py-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2 whitespace-nowrap',
             activeTab === 'logs'
               ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
               : 'text-slate-400 hover:text-white',
@@ -617,7 +617,7 @@ const handleLogout = () => {
         <button
           @click="activeTab = 'whitelist'"
           :class="[
-            'px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2',
+            'px-4 md:px-6 py-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2 whitespace-nowrap',
             activeTab === 'whitelist'
               ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
               : 'text-slate-400 hover:text-white',
@@ -629,7 +629,7 @@ const handleLogout = () => {
         <button
           @click="activeTab = 'guids'"
           :class="[
-            'px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2',
+            'px-4 md:px-6 py-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2 whitespace-nowrap',
             activeTab === 'guids'
               ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
               : 'text-slate-400 hover:text-white',
@@ -641,7 +641,7 @@ const handleLogout = () => {
         <button
           @click="activeTab = 'payloads'"
           :class="[
-            'px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2',
+            'px-4 md:px-6 py-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2 whitespace-nowrap',
             activeTab === 'payloads'
               ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
               : 'text-slate-400 hover:text-white',
@@ -710,9 +710,9 @@ const handleLogout = () => {
 
         <!-- Logs Table -->
         <div
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl"
         >
-          <div class="overflow-x-auto">
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-white/5 border-b border-white/5">
@@ -766,6 +766,42 @@ const handleLogout = () => {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Mobile Cards Layout -->
+          <div class="md:hidden divide-y divide-white/5">
+            <div
+              v-for="log in visibleLogs"
+              :key="log.id"
+              class="p-6 space-y-4 hover:bg-white/5 transition-colors"
+            >
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-mono text-slate-500">{{ log.time }}</span>
+                <span
+                  :class="[
+                    'px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider',
+                    log.severity === 'high'
+                      ? 'bg-red-500/20 text-red-500'
+                      : log.severity === 'medium'
+                        ? 'bg-amber-500/20 text-amber-500'
+                        : 'bg-slate-700/50 text-slate-400',
+                  ]"
+                >
+                  {{ log.type }}
+                </span>
+              </div>
+              <div>
+                <div class="font-bold text-white">{{ log.player }}</div>
+                <div class="text-xs text-slate-500 font-mono mt-0.5">{{ log.guid }}</div>
+              </div>
+              <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Action</div>
+                <div class="text-sm text-slate-200">{{ log.action }}</div>
+                <div v-if="log.details" class="text-xs text-slate-500 mt-1 italic">
+                  {{ log.details }}
+                </div>
+              </div>
+            </div>
           </div>
           <div
             v-if="visibleLogsCount < logs.length"
@@ -866,9 +902,9 @@ const handleLogout = () => {
 
         <!-- Whitelisted Files Table -->
         <div
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl w-full"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl w-full"
         >
-          <div class="overflow-x-auto">
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-white/5 border-b border-white/5">
@@ -922,6 +958,38 @@ const handleLogout = () => {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Mobile Cards Layout -->
+          <div class="md:hidden divide-y divide-white/5">
+            <div
+              v-for="file in visibleWhitelists"
+              :key="file.id"
+              class="p-6 space-y-4 hover:bg-white/5 transition-colors"
+            >
+              <div class="flex justify-between items-start">
+                <div class="font-bold text-lg text-white">{{ file.name }}</div>
+                <button
+                  @click="deleteWhitelist(file.hash)"
+                  class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+              <div class="space-y-2">
+                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">File Hash</div>
+                <div class="text-xs text-amber-500 font-mono bg-amber-500/5 p-3 rounded-xl border border-amber-500/10 break-all">
+                  {{ file.hash }}
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-xs text-slate-500">
+                <span>Added on</span>
+                <span class="font-bold text-slate-400">{{ file.added }}</span>
+              </div>
+            </div>
+            <div v-if="whitelistedFiles.length === 0" class="p-10 text-center text-slate-500 text-sm">
+              No whitelisted files found.
+            </div>
           </div>
           <div
             v-if="visibleWhitelistCount < whitelistedFiles.length"
@@ -1019,9 +1087,9 @@ const handleLogout = () => {
 
         <!-- Custom GUIDs Table -->
         <div
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl w-full"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl w-full"
         >
-          <div class="overflow-x-auto">
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-white/5 border-b border-white/5">
@@ -1076,6 +1144,39 @@ const handleLogout = () => {
               </tbody>
             </table>
           </div>
+
+          <!-- Mobile Cards Layout -->
+          <div class="md:hidden divide-y divide-white/5">
+            <div
+              v-for="item in visibleGuids"
+              :key="item.id"
+              class="p-6 space-y-4 hover:bg-white/5 transition-colors"
+            >
+              <div class="flex justify-between items-center">
+                <div class="space-y-1">
+                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Original GUID</div>
+                  <div class="text-sm font-bold text-slate-400 font-mono tracking-wider">{{ item.original }}</div>
+                </div>
+                <button
+                  @click="deleteGuid(item.original)"
+                  class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+              <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/10">
+                <div class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Mapped To</div>
+                <div class="text-lg font-bold text-emerald-400 font-mono tracking-wider">{{ item.custom }}</div>
+              </div>
+              <div class="flex justify-between items-center text-xs text-slate-500">
+                <span>Created</span>
+                <span class="font-bold text-slate-400">{{ item.added }}</span>
+              </div>
+            </div>
+            <div v-if="customGuidsList.length === 0" class="p-10 text-center text-slate-500 text-sm">
+              No custom GUIDs found.
+            </div>
+          </div>
           <div
             v-if="visibleGuidCount < customGuidsList.length"
             class="px-8 py-4 bg-white/5 border-t border-white/5 text-center"
@@ -1126,7 +1227,7 @@ const handleLogout = () => {
         <!-- Add Payload Form -->
         <div
           v-if="showPayloadForm"
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 shadow-2xl animate-fadeIn"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 shadow-2xl animate-fadeIn"
         >
           <form @submit.prevent="handleAddPayload" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1325,6 +1426,57 @@ const handleLogout = () => {
               </tbody>
             </table>
           </div>
+
+          <!-- Mobile Cards Layout -->
+          <div class="md:hidden divide-y divide-white/5">
+            <div
+              v-for="p in payloads"
+              :key="p.id"
+              class="p-6 space-y-4 hover:bg-white/5 transition-colors"
+            >
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="font-bold text-white">{{ p.fileName }}</div>
+                  <div class="text-[10px] text-slate-500 font-mono mt-1 break-all">{{ p.url }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    v-if="!p.isActive"
+                    @click="activatePayload(p.id)"
+                    class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  >
+                    <Star class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="deletePayload(p.id)"
+                    class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono">
+                  v{{ p.version }}
+                </span>
+                <span
+                  v-if="p.isActive"
+                  class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400"
+                >
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE
+                </span>
+              </div>
+              <div class="space-y-1">
+                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hash</div>
+                <div class="text-xs text-amber-500 font-mono bg-amber-500/5 p-2 rounded-lg border border-amber-500/10 break-all">
+                  {{ p.fileHash }}
+                </div>
+              </div>
+            </div>
+            <div v-if="payloads.length === 0" class="p-10 text-center text-slate-500 text-sm">
+              No payloads found.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1360,5 +1512,14 @@ const handleLogout = () => {
 }
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Scrollbar Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>

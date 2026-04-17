@@ -15,7 +15,7 @@ const developers = [
 <template>
   <div class="space-y-20 pb-20">
     <!-- Hero Section -->
-    <section class="relative h-[80vh] flex items-center justify-center overflow-hidden -mt-24">
+    <section class="relative h-auto md:h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden -mt-24 pt-32 md:pt-0">
       <div class="absolute inset-0 z-0">
         <div class="absolute inset-0 bg-radial-gradient from-amber-500/10 to-transparent"></div>
       </div>
@@ -27,7 +27,7 @@ const developers = [
           <img src="@/assets/home-logo.jpg" alt="SOF2 Logo" class="h-32 md:h-48 object-contain" />
         </div>
         <h1
-          class="text-4xl md:text-7xl font-bold tracking-tighter mb-4 bg-gradient-to-r from-white via-amber-200 to-amber-500 bg-clip-text text-transparent"
+          class="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter mb-4 bg-gradient-to-r from-white via-amber-200 to-amber-500 bg-clip-text text-transparent"
         >
           CHEATHARAM
         </h1>
@@ -61,7 +61,7 @@ const developers = [
         <div class="h-1 w-20 bg-amber-500 mx-auto rounded-full"></div>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         <div
           v-for="dev in developers"
           :key="dev.name"
@@ -85,7 +85,7 @@ const developers = [
     <section
       class="container mx-auto px-6 bg-slate-900/50 py-20 rounded-[3rem] border border-white/5"
     >
-      <div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
         <div class="text-center">
           <div class="mx-auto w-12 h-12 mb-6 text-amber-500">
             <ShieldCheck class="w-full h-full" />

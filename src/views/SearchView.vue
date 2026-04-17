@@ -93,12 +93,12 @@ const handleSearch = async () => {
         v-model="searchQuery"
         @keyup.enter="handleSearch"
         type="text"
-        placeholder="Search by Name or GUID"
-        class="w-full bg-slate-800/50 border-2 border-white/5 rounded-3xl py-6 pl-16 pr-32 text-xl font-medium focus:outline-none focus:border-amber-500/50 transition-all backdrop-blur-md"
+        placeholder="Name or GUID"
+        class="w-full bg-slate-800/50 border-2 border-white/5 rounded-2xl md:rounded-3xl py-4 md:py-6 pl-12 md:pl-16 pr-28 md:pr-32 text-lg md:text-xl font-medium focus:outline-none focus:border-amber-500/50 transition-all backdrop-blur-md"
       />
       <button
         @click="handleSearch"
-        class="absolute right-3 inset-y-3 px-8 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2"
+        class="absolute right-2 md:right-3 inset-y-2 md:inset-y-3 px-4 md:px-8 bg-amber-500 text-black font-bold rounded-xl md:rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2"
       >
         <span v-if="!isSearching">Search</span>
         <span
@@ -134,14 +134,14 @@ const handleSearch = async () => {
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4 md:mt-0">
-            <div class="text-right">
-              <p class="text-xs text-slate-500 uppercase font-bold mb-1">Last Seen</p>
-              <p class="font-medium">{{ player.lastSeen }}</p>
+          <div class="flex flex-col sm:flex-row items-center gap-4 mt-6 md:mt-0 w-full md:w-auto">
+            <div class="text-center md:text-right w-full md:w-auto">
+              <p class="text-[10px] text-slate-500 uppercase font-black mb-1">Last Seen</p>
+              <p class="font-bold text-sm">{{ player.lastSeen }}</p>
             </div>
             <div
               :class="[
-                'flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold uppercase tracking-wider border',
+                'flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border w-full sm:w-auto',
                 player.online
                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                   : 'bg-slate-700/50 text-slate-400 border-white/10',
@@ -163,10 +163,10 @@ const handleSearch = async () => {
             </div>
             <RouterLink
               :to="{ path: '/screenshots', query: { guid: player.guid, name: player.name } }"
-              class="flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold rounded-xl border border-white/10 hover:border-amber-500/30 transition-all"
+              class="flex items-center justify-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-black rounded-xl border border-white/10 hover:border-amber-500/30 transition-all w-full sm:w-auto"
             >
               <Camera class="w-4 h-4 text-amber-500" />
-              View Screenshots
+              Screenshots
             </RouterLink>
           </div>
         </div>

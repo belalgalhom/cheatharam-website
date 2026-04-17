@@ -65,7 +65,7 @@ onMounted(async () => {
       <div
         v-for="player in players"
         :key="player.id"
-        class="group grid md:grid-cols-5 items-center px-8 py-6 bg-slate-800/20 border border-white/5 rounded-3xl hover:bg-slate-800/40 hover:border-amber-500/30 transition-all"
+        class="group flex flex-col md:grid md:grid-cols-5 items-center px-8 py-6 bg-slate-800/20 border border-white/5 rounded-[2rem] md:rounded-3xl hover:bg-slate-800/40 hover:border-amber-500/30 transition-all gap-4 md:gap-0"
       >
         <div class="flex items-center gap-4 mb-4 md:mb-0">
           <div
@@ -88,7 +88,7 @@ onMounted(async () => {
           <span class="text-sm">{{ player.server }}</span>
         </div>
 
-        <div class="flex justify-center">
+        <div class="flex justify-center w-full md:w-auto">
           <span
             class="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-500 text-xs font-bold rounded-full border border-emerald-500/20"
           >
@@ -97,7 +97,7 @@ onMounted(async () => {
           </span>
         </div>
 
-        <div class="flex justify-end mt-4 md:mt-0">
+        <div class="flex justify-center md:justify-end mt-2 md:mt-0 w-full md:w-auto">
           <RouterLink
             :to="{ path: '/screenshots', query: { guid: player.guid, name: player.name } }"
             class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-xl border border-white/10 hover:border-amber-500/30 transition-all"

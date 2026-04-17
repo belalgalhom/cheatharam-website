@@ -8,7 +8,7 @@ import SiteFooter from '@/components/SiteFooter.vue'
   <div class="flex flex-col min-h-screen">
     <NavBar />
 
-    <main class="flex-grow pt-32">
+    <main class="flex-grow pt-24 md:pt-32">
       <RouterView v-slot="{ Component }">
         <transition 
           name="fade" 

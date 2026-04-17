@@ -75,19 +75,23 @@ onUnmounted(() => {
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-4"
     >
-      <div v-if="isOpen" class="md:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-white/10 p-6 space-y-4 shadow-2xl">
+      <div v-if="isOpen" class="md:hidden absolute top-full left-0 right-0 bg-slate-900/95 backdrop-blur-2xl border-b border-white/10 p-6 space-y-3 shadow-2xl">
         <RouterLink v-for="link in navLinks" :key="link.path" :to="link.path"
                     @click="isOpen = false"
-                    class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition-all">
-          <component :is="link.icon" class="w-6 h-6 text-amber-500" />
-          <span class="font-bold text-lg">{{ link.name }}</span>
+                    class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10 group">
+          <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-amber-500/10 transition-all">
+            <component :is="link.icon" class="w-5 h-5 text-slate-400 group-hover:text-amber-500" />
+          </div>
+          <span class="font-bold text-lg text-slate-300 group-hover:text-white">{{ link.name }}</span>
         </RouterLink>
-        <RouterLink to="/download" 
-                    @click="isOpen = false"
-                    class="flex items-center justify-center gap-4 p-4 rounded-xl bg-amber-500 text-black font-bold text-lg">
-          <Download class="w-6 h-6" />
-          Download AC
-        </RouterLink>
+        <div class="pt-2">
+          <RouterLink to="/download" 
+                      @click="isOpen = false"
+                      class="flex items-center justify-center gap-3 p-4 rounded-2xl bg-amber-500 text-black font-black text-lg shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+            <Download class="w-6 h-6" />
+            Download AC
+          </RouterLink>
+        </div>
       </div>
     </Transition>
   </nav>
