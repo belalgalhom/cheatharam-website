@@ -20,6 +20,11 @@ const router = createRouter({
       component: () => import('../views/SearchView.vue'),
     },
     {
+      path: '/player/:id',
+      name: 'player-details',
+      component: () => import('../views/DetailsView.vue'),
+    },
+    {
       path: '/screenshots',
       name: 'screenshots',
       component: () => import('../views/ScreenshotsView.vue'),
@@ -39,20 +44,20 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   const baseTitle = 'CheatHaram - SOF2 Anticheat'
-  
+
   if (to.name === 'home') {
     document.title = baseTitle
     return
   }
-  
+
   const titleMap: Record<string, string> = {
     online: 'Online Players',
     search: 'Player Search',
     screenshots: 'Screenshots',
     download: 'Download',
-    admin: 'Admin Control Panel'
+    admin: 'Admin Control Panel',
   }
-  
+
   const pageName = to.name as string
   if (titleMap[pageName]) {
     document.title = `${titleMap[pageName]} | ${baseTitle}`
