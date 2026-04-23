@@ -82,10 +82,6 @@ const formatDate = (dateStr: string) => {
           </h2>
           <ul class="space-y-4 text-sm">
             <li class="flex justify-between items-center p-3 bg-black/20 rounded-xl">
-              <span class="text-slate-400">Hardware ID (HWID)</span>
-              <span class="font-mono text-white">{{ player.hwid }}</span>
-            </li>
-            <li class="flex justify-between items-center p-3 bg-black/20 rounded-xl">
               <span class="text-slate-400">Original GUID</span>
               <span class="font-mono text-white">{{ player.original_guid }}</span>
             </li>
