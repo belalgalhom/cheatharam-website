@@ -135,7 +135,7 @@ const handleSearch = async () => {
           </div>
 
           <div class="flex flex-col sm:flex-row items-center gap-4 mt-6 md:mt-0 w-full md:w-auto">
-            <div class="text-center md:text-right w-full md:w-auto">
+            <div v-if="!player.online" class="text-center md:text-right w-full md:w-auto">
               <p class="text-[10px] text-slate-500 uppercase font-black mb-1">Last Seen</p>
               <p class="font-bold text-sm">{{ player.lastSeen }}</p>
             </div>
