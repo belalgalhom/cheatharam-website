@@ -85,8 +85,9 @@ const formatDate = (dateStr: string) => {
               <span class="text-slate-400">Original GUID</span>
               <span class="font-mono text-white">{{ player.original_guid }}</span>
             </li>
+
             <li class="flex justify-between items-center p-3 bg-black/20 rounded-xl">
-              <span class="text-slate-400">Custom/Spoofed GUID</span>
+              <span class="text-slate-400">Custom GUID</span>
               <span
                 :class="[
                   'font-mono font-bold',
@@ -96,6 +97,7 @@ const formatDate = (dateStr: string) => {
                 {{ player.custom_guid || 'None' }}
               </span>
             </li>
+
             <li class="flex justify-between items-center p-3 bg-black/20 rounded-xl">
               <span class="text-slate-400">First Seen</span>
               <span class="text-white">{{ formatDate(player.createdAt) }}</span>
