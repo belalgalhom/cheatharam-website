@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Server, User, Hash, Camera } from 'lucide-vue-next'
 
 import { api } from '@/utils/api'
 
 const players = ref<any[]>([])
-
-import { onMounted } from 'vue'
 
 const totalServers = computed(() => {
   const uniqueServers = new Set(players.value.map((p) => p.server))
