@@ -127,9 +127,11 @@ const handleSearch = async () => {
             </div>
             <div>
               <h3 class="text-2xl font-bold">{{ player.name }}</h3>
-              <div class="flex items-center gap-2 text-slate-400 text-sm">
+              <div class="flex items-center gap-2 text-slate-400 mb-2 md:mb-0">
                 <Hash class="w-4 h-4" />
-                <code>{{ player.guid }}</code>
+                <code class="text-xs font-mono bg-black/30 px-2 py-1 rounded-md">{{
+                  player.guid
+                }}</code>
               </div>
             </div>
           </div>
