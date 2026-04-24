@@ -8,6 +8,11 @@ const players = ref<any[]>([])
 
 import { onMounted } from 'vue'
 
+const totalServers = computed(() => {
+  const uniqueServers = new Set(players.value.map((p) => p.server))
+  return uniqueServers.size
+})
+
 onMounted(async () => {
   try {
     const res = await api.get('/players/online')
@@ -15,7 +20,8 @@ onMounted(async () => {
       const data = await res.json()
       const rawPlayers = Array.isArray(data) ? data : data.players || []
       players.value = rawPlayers.map((p: any) => ({
-        id: p.clientId || p.id || Date.now() + Math.random(),
+        id: p.clientId || p.id,
+        uniqueKey: p.clientId || p.id || p.guid || Date.now() + Math.random(),
         name: p.name || 'UnnamedPlayer',
         guid: p.guid || 'Unknown',
         server: p.server || 'Unknown Server',
@@ -47,8 +53,8 @@ const isIpAddress = (serverStr: string) => {
         </div>
         <div class="w-px h-10 bg-white/10"></div>
         <div class="flex flex-col">
-          <span class="text-xs text-slate-500 uppercase font-bold">Servers Active</span>
-          <span class="text-2xl font-bold text-white">3</span>
+          <span class="text-xs text-slate-500 uppercase font-bold">Total Servers</span>
+          <span class="text-2xl font-bold text-white">{{ totalServers }}</span>
         </div>
       </div>
     </div>
@@ -68,7 +74,7 @@ const isIpAddress = (serverStr: string) => {
       <!-- Player Cards -->
       <div
         v-for="player in players"
-        :key="player.id"
+        :key="player.uniqueKey"
         class="group flex flex-col md:grid md:grid-cols-5 items-center px-8 py-6 bg-slate-800/20 border border-white/5 rounded-[2rem] md:rounded-3xl hover:bg-slate-800/40 hover:border-amber-500/30 transition-all gap-4 md:gap-0"
       >
         <div class="flex items-center gap-4 mb-4 md:mb-0">

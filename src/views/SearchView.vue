@@ -60,8 +60,8 @@ const handleSearch = async () => {
     }
 
     searchResult.value = clients.map((c) => ({
-      id: c.id,
-      name: c.currentName || 'UnnamedPlayer',
+      id: c.id || c.clientId,
+      name: c.currentName || c.name || 'UnnamedPlayer',
       guid: c.guid,
       lastSeen: formatLastSeen(c.lastSeen),
       online: onlineGuids.includes(c.guid),
@@ -161,17 +161,19 @@ const handleSearch = async () => {
               </span>
               {{ player.online ? 'Online' : 'Offline' }}
             </div>
-            <div class="flex gap-2 w-full sm:w-auto">
+            <div class="flex justify-center md:justify-end mt-2 md:mt-0 w-full md:w-auto gap-2">
               <RouterLink
+                v-if="player.id"
                 :to="{ path: `/player/${player.id}` }"
                 class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-black rounded-xl border border-white/10 hover:border-blue-500/30 transition-all flex-1"
               >
                 <User class="w-4 h-4 text-blue-500" />
                 Details
               </RouterLink>
+
               <RouterLink
                 :to="{ path: '/screenshots', query: { guid: player.guid, name: player.name } }"
-                class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-black rounded-xl border border-white/10 hover:border-amber-500/30 transition-all flex-1"
+                class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-xl border border-white/10 hover:border-amber-500/30 transition-all"
               >
                 <Camera class="w-4 h-4 text-amber-500" />
                 Screenshots
