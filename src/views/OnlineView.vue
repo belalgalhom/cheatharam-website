@@ -25,6 +25,10 @@ onMounted(async () => {
     console.error(err)
   }
 })
+
+const isIpAddress = (serverStr: string) => {
+  return /^\d{1,3}(\.\d{1,3}){3}:\d+$/.test(serverStr)
+}
 </script>
 
 <template>
@@ -85,7 +89,16 @@ onMounted(async () => {
 
         <div class="flex items-center gap-2 text-slate-400 mb-4 md:mb-0">
           <Server class="w-4 h-4 text-emerald-500" />
-          <span class="text-sm">{{ player.server }}</span>
+
+          <a
+            v-if="isIpAddress(player.server)"
+            :href="`cheatharam://${player.server}`"
+            class="text-sm hover:text-amber-500 transition-colors cursor-pointer underline decoration-white/20 hover:decoration-amber-500/50 underline-offset-4"
+          >
+            {{ player.server }}
+          </a>
+
+          <span v-else class="text-sm">{{ player.server }}</span>
         </div>
 
         <div class="flex justify-center w-full md:w-auto">
