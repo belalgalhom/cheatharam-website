@@ -114,7 +114,16 @@ const isIpAddress = (serverStr: string) => {
           </span>
         </div>
 
-        <div class="flex justify-center md:justify-end mt-2 md:mt-0 w-full md:w-auto">
+        <div class="flex justify-center md:justify-end mt-2 md:mt-0 w-full md:w-auto gap-2">
+          <RouterLink
+            v-if="player.id"
+            :to="{ path: `/player/${player.id}` }"
+            class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-xl border border-white/10 hover:border-blue-500/30 transition-all"
+          >
+            <User class="w-4 h-4 text-blue-500" />
+            Details
+          </RouterLink>
+
           <RouterLink
             :to="{ path: '/screenshots', query: { guid: player.guid, name: player.name } }"
             class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-xl border border-white/10 hover:border-amber-500/30 transition-all"
