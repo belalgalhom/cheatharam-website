@@ -20,7 +20,6 @@ import { Shield } from 'lucide-vue-next'
             Providing top-tier security for the Soldier of Fortune II community. Dedicated to
             maintaining fair play and competitive integrity through advanced anti-tamper technology.
           </p>
-
         </div>
 
         <!-- Links -->
@@ -63,7 +62,6 @@ import { Shield } from 'lucide-vue-next'
                 >Download</RouterLink
               >
             </li>
-
           </ul>
         </div>
       </div>
@@ -73,9 +71,8 @@ import { Shield } from 'lucide-vue-next'
         class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-600 text-sm"
       >
         <p>© 2026 CheatHaram Anticheat System.</p>
-        <div class="flex items-center gap-6">
-        </div>
-        <p>Developed by Dracula &amp; Devil.</p>
+        <div class="flex items-center gap-6"></div>
+        <p>Developed by Dracula &amp; Devil &amp; Kyro.</p>
       </div>
     </div>
   </footer>
