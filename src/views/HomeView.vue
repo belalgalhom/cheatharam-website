@@ -15,7 +15,9 @@ const developers = [
 <template>
   <div class="space-y-20 pb-20">
     <!-- Hero Section -->
-    <section class="relative h-auto md:h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden -mt-24 pt-32 md:pt-0">
+    <section
+      class="relative h-auto md:h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden -mt-24 pt-32 md:pt-0"
+    >
       <div class="absolute inset-0 z-0">
         <div class="absolute inset-0 bg-radial-gradient from-amber-500/10 to-transparent"></div>
       </div>
@@ -80,6 +82,26 @@ const developers = [
         </div>
       </div>
     </section>
+
+    <div class="flex flex-col items-center justify-center my-12">
+      <div
+        class="bg-slate-800/30 border border-white/5 p-6 rounded-[2rem] backdrop-blur-sm w-full max-w-[400px] hover:bg-slate-800/50 transition-all hover:border-indigo-500/30"
+      >
+        <div class="flex items-center gap-3 mb-6">
+          <h2 class="text-2xl font-bold text-white">Join Our Discord</h2>
+        </div>
+
+        <iframe
+          src="https://discord.com/widget?id=1450621334596878356&theme=dark"
+          width="100%"
+          height="500"
+          allowtransparency="true"
+          frameborder="0"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+          class="rounded-xl bg-slate-900"
+        ></iframe>
+      </div>
+    </div>
 
     <!-- Features Quick Look -->
     <section
