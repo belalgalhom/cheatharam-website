@@ -8,10 +8,7 @@ const developers = [
   },
   {
     name: 'Devil',
-  },
-  {
-    name: 'Kyro',
-  },
+  }
 ]
 </script>
 
