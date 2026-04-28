@@ -14,7 +14,6 @@ const developers = [
 
 <template>
   <div class="space-y-20 pb-20">
-    <!-- Hero Section -->
     <section
       class="relative h-auto md:h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden -mt-24 pt-32 md:pt-0"
     >
@@ -56,7 +55,6 @@ const developers = [
       </div>
     </section>
 
-    <!-- Developers Section -->
     <section class="container mx-auto px-6">
       <div class="text-center mb-16">
         <h2 class="text-3xl md:text-4xl font-bold mb-4">The Architects</h2>
@@ -83,7 +81,6 @@ const developers = [
       </div>
     </section>
 
-    <!-- Features Quick Look -->
     <section
       class="container mx-auto px-6 bg-slate-900/50 py-20 rounded-[3rem] border border-white/5"
     >
