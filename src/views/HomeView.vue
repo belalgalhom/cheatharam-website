@@ -83,26 +83,6 @@ const developers = [
       </div>
     </section>
 
-    <div class="flex flex-col items-center justify-center my-12">
-      <div
-        class="bg-slate-800/30 border border-white/5 p-6 rounded-[2rem] backdrop-blur-sm w-full max-w-[400px] hover:bg-slate-800/50 transition-all hover:border-indigo-500/30"
-      >
-        <div class="flex items-center gap-3 mb-6">
-          <h2 class="text-2xl font-bold text-white">Join Our Discord</h2>
-        </div>
-
-        <iframe
-          src="https://discord.com/widget?id=1450621334596878356&theme=dark"
-          width="100%"
-          height="500"
-          allowtransparency="true"
-          frameborder="0"
-          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-          class="rounded-xl bg-slate-900"
-        ></iframe>
-      </div>
-    </div>
-
     <!-- Features Quick Look -->
     <section
       class="container mx-auto px-6 bg-slate-900/50 py-20 rounded-[3rem] border border-white/5"
