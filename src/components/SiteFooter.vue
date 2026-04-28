@@ -71,8 +71,6 @@ import { Shield } from 'lucide-vue-next'
         class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-600 text-sm"
       >
         <p>© 2026 CheatHaram Anticheat System.</p>
-        <div class="flex items-center gap-6"></div>
-        <p>Developed by Dracula &amp; Devil.</p>
       </div>
     </div>
   </footer>

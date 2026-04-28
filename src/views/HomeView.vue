@@ -8,7 +8,7 @@ const developers = [
   },
   {
     name: 'Devil',
-  }
+  },
 ]
 </script>
 
@@ -59,7 +59,7 @@ const developers = [
     <!-- Developers Section -->
     <section class="container mx-auto px-6">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">The Architects</h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Anticheat Developers</h2>
         <div class="h-1 w-20 bg-amber-500 mx-auto rounded-full"></div>
       </div>
 
