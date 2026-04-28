@@ -72,7 +72,7 @@ import { Shield } from 'lucide-vue-next'
       >
         <p>© 2026 CheatHaram Anticheat System.</p>
         <div class="flex items-center gap-6"></div>
-        <p>Developed by Dracula &amp; Devil &amp; Kyro.</p>
+        <p>Developed by Dracula &amp; Devil.</p>
       </div>
     </div>
   </footer>
