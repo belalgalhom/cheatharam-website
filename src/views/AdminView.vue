@@ -1073,9 +1073,18 @@ const handleLogout = () => {
           </button>
         </div>
 
+        <!-- Success Status -->
+        <div
+          v-if="whitelistStatus"
+          class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20"
+        >
+          <Check class="w-5 h-5" />
+          {{ whitelistStatus }}
+        </div>
+
         <div
           v-if="showWhitelistForm"
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl mb-8 animate-fadeIn"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl mb-8 animate-fadeIn mt-6"
         >
           <form @submit.prevent="handleAddWhitelist" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1105,14 +1114,6 @@ const handleLogout = () => {
                   class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>
-            </div>
-
-            <div
-              v-if="whitelistStatus"
-              class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20"
-            >
-              <Check class="w-5 h-5" />
-              {{ whitelistStatus }}
             </div>
 
             <button
@@ -1276,9 +1277,18 @@ const handleLogout = () => {
           </button>
         </div>
 
+        <!-- Success Status -->
+        <div
+          v-if="guidStatus"
+          class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20"
+        >
+          <Check class="w-5 h-5" />
+          {{ guidStatus }}
+        </div>
+
         <div
           v-if="showGuidForm"
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl mb-8 animate-fadeIn"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl mb-8 animate-fadeIn mt-6"
         >
           <form @submit.prevent="handleAddGuid" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1307,14 +1317,6 @@ const handleLogout = () => {
                   class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-3 px-4 text-white font-mono text-sm tracking-wider focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
                 />
               </div>
-            </div>
-
-            <div
-              v-if="guidStatus"
-              class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20"
-            >
-              <Check class="w-5 h-5" />
-              {{ guidStatus }}
             </div>
 
             <button
