@@ -1912,7 +1912,10 @@ const handleLogout = () => {
                     File Name
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
-                    Version & Secret
+                    Version
+                  </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Client Secret
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Status
@@ -1935,7 +1938,11 @@ const handleLogout = () => {
                       class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono"
                       >v{{ l.version }}</span
                     >
-                    <div class="text-[10px] text-amber-500 font-mono mt-1 break-all">Secret: {{ l.clientSecret }}</div>
+                  </td>
+                  <td class="px-8 py-6">
+                    <div class="text-[10px] text-amber-500 font-mono bg-amber-500/5 p-2 rounded-lg border border-amber-500/10 break-all w-fit">
+                      {{ l.clientSecret }}
+                    </div>
                   </td>
                   <td class="px-8 py-6">
                     <span
@@ -1977,7 +1984,7 @@ const handleLogout = () => {
                   </td>
                 </tr>
                 <tr v-if="loaders.length === 0">
-                  <td colspan="4" class="px-8 py-10 text-center text-slate-500 text-sm">
+                  <td colspan="5" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No loaders found.
                   </td>
                 </tr>
