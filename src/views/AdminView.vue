@@ -1053,7 +1053,7 @@ const handleLogout = () => {
       </div>
 
       <!-- Tab: File Whitelist -->
-      <div v-else-if="activeTab === 'whitelist'" class="animate-fadeIn">
+      <div v-else-if="activeTab === 'whitelist'" class="animate-fadeIn space-y-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
             <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
@@ -1084,7 +1084,7 @@ const handleLogout = () => {
 
         <div
           v-if="showWhitelistForm"
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl mb-8 animate-fadeIn mt-6"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl animate-fadeIn"
         >
           <form @submit.prevent="handleAddWhitelist" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1259,7 +1259,7 @@ const handleLogout = () => {
       </div>
 
       <!-- Tab: Custom GUIDs -->
-      <div v-else-if="activeTab === 'guids'" class="animate-fadeIn">
+      <div v-else-if="activeTab === 'guids'" class="animate-fadeIn space-y-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
             <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
@@ -1288,7 +1288,7 @@ const handleLogout = () => {
 
         <div
           v-if="showGuidForm"
-          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl mb-8 animate-fadeIn mt-6"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 max-w-2xl shadow-2xl animate-fadeIn"
         >
           <form @submit.prevent="handleAddGuid" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
