@@ -17,6 +17,7 @@ import {
   Star,
   UploadCloud,
   DownloadCloud,
+  Edit,
 } from 'lucide-vue-next'
 
 const isAuthenticated = ref(false)
@@ -201,6 +202,7 @@ const loadMoreLogs = () => {
 
 // Whitelist Form State
 const showWhitelistForm = ref(false)
+const editingWhitelistId = ref<number | null>(null)
 const newWhitelistName = ref('')
 const newWhitelistHash = ref('')
 const isAddingWhitelist = ref(false)
@@ -258,19 +260,37 @@ const handleAddWhitelist = async () => {
   if (!newWhitelistName.value || !newWhitelistHash.value) return
   isAddingWhitelist.value = true
   try {
-    const response = await api.post('/whitelists', {
-      name: newWhitelistName.value,
-      hash: newWhitelistHash.value,
-    })
-    if (response.ok) {
-      whitelistStatus.value = `File ${newWhitelistName.value} successfully whitelisted.`
-      newWhitelistName.value = ''
-      newWhitelistHash.value = ''
-      fetchWhitelists()
-      showWhitelistForm.value = false
-      setTimeout(() => {
-        whitelistStatus.value = ''
-      }, 3000)
+    if (editingWhitelistId.value) {
+      const response = await api.put(`/whitelists/${editingWhitelistId.value}`, {
+        name: newWhitelistName.value,
+        hash: newWhitelistHash.value,
+      })
+      if (response.ok) {
+        whitelistStatus.value = `Whitelist entry updated successfully.`
+        newWhitelistName.value = ''
+        newWhitelistHash.value = ''
+        editingWhitelistId.value = null
+        fetchWhitelists()
+        showWhitelistForm.value = false
+        setTimeout(() => {
+          whitelistStatus.value = ''
+        }, 3000)
+      }
+    } else {
+      const response = await api.post('/whitelists', {
+        name: newWhitelistName.value,
+        hash: newWhitelistHash.value,
+      })
+      if (response.ok) {
+        whitelistStatus.value = `File ${newWhitelistName.value} whitelisted successfully.`
+        newWhitelistName.value = ''
+        newWhitelistHash.value = ''
+        fetchWhitelists()
+        showWhitelistForm.value = false
+        setTimeout(() => {
+          whitelistStatus.value = ''
+        }, 3000)
+      }
     }
   } catch (err) {
     console.error(err)
@@ -279,8 +299,16 @@ const handleAddWhitelist = async () => {
   }
 }
 
+const editWhitelist = (file: any) => {
+  newWhitelistName.value = file.name
+  newWhitelistHash.value = file.hash
+  editingWhitelistId.value = file.id
+  showWhitelistForm.value = true
+}
+
 // GUID Form State
 const showGuidForm = ref(false)
+const editingGuidId = ref<number | null>(null)
 const newGuidOriginal = ref('')
 const newGuidCustom = ref('')
 const isAddingGuid = ref(false)
@@ -325,25 +353,50 @@ const handleAddGuid = async () => {
   if (!newGuidOriginal.value || !newGuidCustom.value) return
   isAddingGuid.value = true
   try {
-    const response = await api.post('/guids', {
-      originalGuid: newGuidOriginal.value,
-      customGuid: newGuidCustom.value,
-    })
-    if (response.ok) {
-      guidStatus.value = `Original GUID ${newGuidOriginal.value} mapped to ${newGuidCustom.value}.`
-      newGuidOriginal.value = ''
-      newGuidCustom.value = ''
-      fetchGuids()
-      showGuidForm.value = false
-      setTimeout(() => {
-        guidStatus.value = ''
-      }, 3000)
+    if (editingGuidId.value) {
+      const response = await api.put(`/guids/${editingGuidId.value}`, {
+        originalGuid: newGuidOriginal.value,
+        customGuid: newGuidCustom.value,
+      })
+      if (response.ok) {
+        guidStatus.value = `GUID mapping updated successfully.`
+        newGuidOriginal.value = ''
+        newGuidCustom.value = ''
+        editingGuidId.value = null
+        fetchGuids()
+        showGuidForm.value = false
+        setTimeout(() => {
+          guidStatus.value = ''
+        }, 3000)
+      }
+    } else {
+      const response = await api.post('/guids', {
+        originalGuid: newGuidOriginal.value,
+        customGuid: newGuidCustom.value,
+      })
+      if (response.ok) {
+        guidStatus.value = `Original GUID ${newGuidOriginal.value} mapped to ${newGuidCustom.value}.`
+        newGuidOriginal.value = ''
+        newGuidCustom.value = ''
+        fetchGuids()
+        showGuidForm.value = false
+        setTimeout(() => {
+          guidStatus.value = ''
+        }, 3000)
+      }
     }
   } catch (err) {
     console.error(err)
   } finally {
     isAddingGuid.value = false
   }
+}
+
+const editGuid = (item: any) => {
+  newGuidOriginal.value = item.original
+  newGuidCustom.value = item.custom
+  editingGuidId.value = item.id
+  showGuidForm.value = true
 }
 
 const deleteGuid = async (originalGuid: string) => {
@@ -360,6 +413,7 @@ const deleteGuid = async (originalGuid: string) => {
 // Payload State
 const payloads = ref<any[]>([])
 const showPayloadForm = ref(false)
+const editingPayloadId = ref<number | null>(null)
 const newPayloadUrl = ref('')
 const newPayloadFileName = ref('')
 const newPayloadFileHash = ref('')
@@ -415,39 +469,64 @@ const fetchPayloads = async () => {
 }
 
 const handleAddPayload = async () => {
-  if (
-    !newPayloadUrl.value ||
-    !newPayloadFileName.value ||
-    !newPayloadFileHash.value ||
-    !newPayloadVersion.value
-  )
-    return
+  if (!newPayloadUrl.value || !newPayloadFileName.value || !newPayloadVersion.value) return
   isAddingPayload.value = true
   try {
-    const res = await api.post('/payloads', {
-      url: newPayloadUrl.value,
-      fileName: newPayloadFileName.value,
-      fileHash: newPayloadFileHash.value,
-      version: newPayloadVersion.value,
-      isActive: true,
-    })
-    if (res.ok) {
-      payloadStatus.value = `Payload v${newPayloadVersion.value} registered successfully.`
-      newPayloadUrl.value = ''
-      newPayloadFileName.value = ''
-      newPayloadFileHash.value = ''
-      newPayloadVersion.value = ''
-      showPayloadForm.value = false
-      fetchPayloads()
-      setTimeout(() => {
-        payloadStatus.value = ''
-      }, 3000)
+    if (editingPayloadId.value) {
+      const res = await api.put(`/payloads/${editingPayloadId.value}`, {
+        url: newPayloadUrl.value,
+        fileName: newPayloadFileName.value,
+        version: newPayloadVersion.value,
+        fileHash: newPayloadFileHash.value,
+      })
+      if (res.ok) {
+        payloadStatus.value = `Payload updated successfully.`
+        newPayloadUrl.value = ''
+        newPayloadFileName.value = ''
+        newPayloadFileHash.value = ''
+        newPayloadVersion.value = ''
+        editingPayloadId.value = null
+        showPayloadForm.value = false
+        fetchPayloads()
+        setTimeout(() => {
+          payloadStatus.value = ''
+        }, 3000)
+      }
+    } else {
+      const res = await api.post('/payloads', {
+        url: newPayloadUrl.value,
+        fileName: newPayloadFileName.value,
+        fileHash: newPayloadFileHash.value,
+        version: newPayloadVersion.value,
+        isActive: true,
+      })
+      if (res.ok) {
+        payloadStatus.value = `Payload v${newPayloadVersion.value} registered successfully.`
+        newPayloadUrl.value = ''
+        newPayloadFileName.value = ''
+        newPayloadFileHash.value = ''
+        newPayloadVersion.value = ''
+        showPayloadForm.value = false
+        fetchPayloads()
+        setTimeout(() => {
+          payloadStatus.value = ''
+        }, 3000)
+      }
     }
   } catch (e) {
     console.error(e)
   } finally {
     isAddingPayload.value = false
   }
+}
+
+const editPayload = (p: any) => {
+  newPayloadUrl.value = p.url
+  newPayloadFileName.value = p.fileName
+  newPayloadFileHash.value = p.fileHash
+  newPayloadVersion.value = p.version
+  editingPayloadId.value = p.id
+  showPayloadForm.value = true
 }
 
 const activatePayload = async (id: number) => {
@@ -471,6 +550,7 @@ const deletePayload = async (id: number) => {
 // Loader State
 const loaders = ref<any[]>([])
 const showLoaderForm = ref(false)
+const editingLoaderId = ref<number | null>(null)
 const newLoaderUrl = ref('')
 const newLoaderFileName = ref('')
 const newLoaderVersion = ref('')
@@ -528,30 +608,61 @@ const handleAddLoader = async () => {
   if (!newLoaderUrl.value || !newLoaderFileName.value || !newLoaderVersion.value || !newLoaderClientSecret.value) return
   isAddingLoader.value = true
   try {
-    const res = await api.post('/loaders', {
-      url: newLoaderUrl.value,
-      fileName: newLoaderFileName.value,
-      version: newLoaderVersion.value,
-      clientSecret: newLoaderClientSecret.value,
-      isActive: true,
-    })
-    if (res.ok) {
-      loaderStatus.value = `Loader v${newLoaderVersion.value} registered successfully.`
-      newLoaderUrl.value = ''
-      newLoaderFileName.value = ''
-      newLoaderVersion.value = ''
-      newLoaderClientSecret.value = ''
-      showLoaderForm.value = false
-      fetchLoaders()
-      setTimeout(() => {
-        loaderStatus.value = ''
-      }, 3000)
+    if (editingLoaderId.value) {
+      const res = await api.put(`/loaders/${editingLoaderId.value}`, {
+        url: newLoaderUrl.value,
+        fileName: newLoaderFileName.value,
+        version: newLoaderVersion.value,
+        clientSecret: newLoaderClientSecret.value,
+      })
+      if (res.ok) {
+        loaderStatus.value = `Loader updated successfully.`
+        newLoaderUrl.value = ''
+        newLoaderFileName.value = ''
+        newLoaderVersion.value = ''
+        newLoaderClientSecret.value = ''
+        editingLoaderId.value = null
+        showLoaderForm.value = false
+        fetchLoaders()
+        setTimeout(() => {
+          loaderStatus.value = ''
+        }, 3000)
+      }
+    } else {
+      const res = await api.post('/loaders', {
+        url: newLoaderUrl.value,
+        fileName: newLoaderFileName.value,
+        version: newLoaderVersion.value,
+        clientSecret: newLoaderClientSecret.value,
+        isActive: true,
+      })
+      if (res.ok) {
+        loaderStatus.value = `Loader v${newLoaderVersion.value} registered successfully.`
+        newLoaderUrl.value = ''
+        newLoaderFileName.value = ''
+        newLoaderVersion.value = ''
+        newLoaderClientSecret.value = ''
+        showLoaderForm.value = false
+        fetchLoaders()
+        setTimeout(() => {
+          loaderStatus.value = ''
+        }, 3000)
+      }
     }
   } catch (e) {
     console.error(e)
   } finally {
     isAddingLoader.value = false
   }
+}
+
+const editLoader = (l: any) => {
+  newLoaderUrl.value = l.url
+  newLoaderFileName.value = l.fileName
+  newLoaderVersion.value = l.version
+  newLoaderClientSecret.value = l.clientSecret
+  editingLoaderId.value = l.id
+  showLoaderForm.value = true
 }
 
 const activateLoader = async (id: number) => {
@@ -954,11 +1065,11 @@ const handleLogout = () => {
             </p>
           </div>
           <button
-            @click="showWhitelistForm = !showWhitelistForm"
+            @click="showWhitelistForm = !showWhitelistForm; if(!showWhitelistForm) { editingWhitelistId = null; newWhitelistName = ''; newWhitelistHash = ''; }"
             class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
           >
             <PlusCircle class="w-5 h-5" />
-            {{ showWhitelistForm ? 'Cancel Form' : 'Add Whitelist Entry' }}
+            {{ showWhitelistForm ? 'Cancel' : 'Add Whitelist Entry' }}
           </button>
         </div>
 
@@ -1010,7 +1121,7 @@ const handleLogout = () => {
               class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <PlusCircle v-if="!isAddingWhitelist" class="w-5 h-5" />
-              <span v-if="!isAddingWhitelist">Save File Hash</span>
+              <span v-if="!isAddingWhitelist">{{ editingWhitelistId ? 'Update' : 'Save File Hash' }}</span>
               <span
                 v-else
                 class="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
@@ -1061,8 +1172,16 @@ const handleLogout = () => {
                     {{ file.added }}
                   </td>
                   <td class="px-8 py-6">
-                    <button
-                      @click="deleteWhitelist(file.hash)"
+                    <div class="flex items-center gap-2">
+                      <button
+                        @click="editWhitelist(file)"
+                        class="p-2 rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+                        title="Edit"
+                      >
+                        <Edit class="w-4 h-4" />
+                      </button>
+                      <button
+                        @click="deleteWhitelist(file.hash)"
                       class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
                       title="Delete"
                     >
@@ -1088,8 +1207,15 @@ const handleLogout = () => {
             >
               <div class="flex justify-between items-start">
                 <div class="font-bold text-lg text-white">{{ file.name }}</div>
-                <button
-                  @click="deleteWhitelist(file.hash)"
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="editWhitelist(file)"
+                    class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  >
+                    <Edit class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="deleteWhitelist(file.hash)"
                   class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
                 >
                   <Trash2 class="w-4 h-4" />
@@ -1140,11 +1266,11 @@ const handleLogout = () => {
             <p class="text-slate-400">Map original hardware GUIDs to custom spoofed identifiers.</p>
           </div>
           <button
-            @click="showGuidForm = !showGuidForm"
+            @click="showGuidForm = !showGuidForm; if(!showGuidForm) { editingGuidId = null; newGuidOriginal = ''; newGuidCustom = ''; }"
             class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
           >
             <PlusCircle class="w-5 h-5" />
-            {{ showGuidForm ? 'Cancel Mapping' : 'Map Custom GUID' }}
+            {{ showGuidForm ? 'Cancel' : 'Map Custom GUID' }}
           </button>
         </div>
 
@@ -1195,7 +1321,7 @@ const handleLogout = () => {
               class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <PlusCircle v-if="!isAddingGuid" class="w-5 h-5" />
-              <span v-if="!isAddingGuid">Authorize GUID Mapping</span>
+              <span v-if="!isAddingGuid">{{ editingGuidId ? 'Update' : 'Authorize GUID Mapping' }}</span>
               <span
                 v-else
                 class="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
@@ -1246,8 +1372,16 @@ const handleLogout = () => {
                     {{ item.added }}
                   </td>
                   <td class="px-8 py-6">
-                    <button
-                      @click="deleteGuid(item.original)"
+                    <div class="flex items-center gap-2">
+                      <button
+                        @click="editGuid(item)"
+                        class="p-2 rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+                        title="Edit"
+                      >
+                        <Edit class="w-4 h-4" />
+                      </button>
+                      <button
+                        @click="deleteGuid(item.original)"
                       class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
                       title="Delete"
                     >
@@ -1276,8 +1410,15 @@ const handleLogout = () => {
                   <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Original GUID</div>
                   <div class="text-sm font-bold text-slate-400 font-mono tracking-wider">{{ item.original }}</div>
                 </div>
-                <button
-                  @click="deleteGuid(item.original)"
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="editGuid(item)"
+                    class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  >
+                    <Edit class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="deleteGuid(item.original)"
                   class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
                 >
                   <Trash2 class="w-4 h-4" />
@@ -1326,7 +1467,7 @@ const handleLogout = () => {
             <p class="text-slate-400">Manage anticheat client payloads deployed to game servers.</p>
           </div>
           <button
-            @click="showPayloadForm = !showPayloadForm"
+            @click="showPayloadForm = !showPayloadForm; if(!showPayloadForm) { editingPayloadId = null; newPayloadUrl = ''; newPayloadFileName = ''; newPayloadFileHash = ''; newPayloadVersion = ''; }"
             class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
           >
             <PlusCircle class="w-5 h-5" />
@@ -1449,7 +1590,7 @@ const handleLogout = () => {
               class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <PlusCircle v-if="!isAddingPayload" class="w-5 h-5" />
-              <span v-if="!isAddingPayload">Deploy Payload</span>
+              <span v-if="!isAddingPayload">{{ editingPayloadId ? 'Update' : 'Deploy Payload' }}</span>
               <span
                 v-else
                 class="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
@@ -1528,6 +1669,13 @@ const handleLogout = () => {
                         <Star class="w-4 h-4" />
                       </button>
                       <button
+                        @click="editPayload(p)"
+                        class="p-1.5 rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+                        title="Edit"
+                      >
+                        <Edit class="w-4 h-4" />
+                      </button>
+                      <button
                         @click="deletePayload(p.id)"
                         class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
                         title="Delete"
@@ -1565,6 +1713,12 @@ const handleLogout = () => {
                     class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                   >
                     <Star class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="editPayload(p)"
+                    class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  >
+                    <Edit class="w-4 h-4" />
                   </button>
                   <button
                     @click="deletePayload(p.id)"
@@ -1610,7 +1764,7 @@ const handleLogout = () => {
             <p class="text-slate-400">Manage client loaders deployed to game servers.</p>
           </div>
           <button
-            @click="showLoaderForm = !showLoaderForm"
+            @click="showLoaderForm = !showLoaderForm; if(!showLoaderForm) { editingLoaderId = null; newLoaderUrl = ''; newLoaderFileName = ''; newLoaderVersion = ''; newLoaderClientSecret = ''; }"
             class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
           >
             <PlusCircle class="w-5 h-5" />
@@ -1733,7 +1887,7 @@ const handleLogout = () => {
               class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <PlusCircle v-if="!isAddingLoader" class="w-5 h-5" />
-              <span v-if="!isAddingLoader">Deploy Loader</span>
+              <span v-if="!isAddingLoader">{{ editingLoaderId ? 'Update' : 'Deploy Loader' }}</span>
               <span
                 v-else
                 class="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
@@ -1802,6 +1956,13 @@ const handleLogout = () => {
                         <Star class="w-4 h-4" /> Activate
                       </button>
                       <button
+                        @click="editLoader(l)"
+                        class="p-1.5 rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+                        title="Edit"
+                      >
+                        <Edit class="w-4 h-4" />
+                      </button>
+                      <button
                         @click="deleteLoader(l.id)"
                         class="p-1.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
                         title="Delete"
@@ -1839,6 +2000,12 @@ const handleLogout = () => {
                     class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                   >
                     <Star class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="editLoader(l)"
+                    class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  >
+                    <Edit class="w-4 h-4" />
                   </button>
                   <button
                     @click="deleteLoader(l.id)"
