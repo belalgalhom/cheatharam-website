@@ -445,7 +445,8 @@ const handleFileSelect = async (event: Event) => {
         const data = await res.json()
         newPayloadUrl.value = data.url
         newPayloadFileName.value = file.name
-        payloadStatus.value = 'File uploaded successfully! You can now deploy the payload.'
+        newPayloadFileHash.value = data.fileHash ?? ''
+        payloadStatus.value = 'File uploaded successfully! Hash auto-filled. You can now deploy the payload.'
       } else {
         payloadStatus.value = 'File upload failed.'
       }
@@ -1586,14 +1587,13 @@ const handleLogout = () => {
               <div class="md:col-span-2">
                 <label
                   class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
-                  >SHA-256 File Hash</label
+                  >Hash <span class="normal-case text-slate-600">(auto-computed on upload)</span></label
                 >
                 <input
-                  v-model="newPayloadFileHash"
+                  :value="newPayloadFileHash || '—'"
                   type="text"
-                  required
-                  placeholder="e.g. 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a..."
-                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                  readonly
+                  class="w-full bg-slate-800/30 border border-white/5 rounded-2xl py-4 px-4 text-slate-500 font-mono cursor-not-allowed select-none shadow-inner truncate"
                 />
               </div>
             </div>
