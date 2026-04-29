@@ -13,7 +13,7 @@ import {
   ZoomIn,
   ZoomOut,
   X,
-  Globe, // Added Globe icon for server IP
+  Globe,
 } from 'lucide-vue-next'
 import { api } from '@/utils/api'
 
@@ -42,7 +42,7 @@ const fetchScreenshots = async () => {
               guid: filterGuid.value,
               date: new Date(s.createdAt).toLocaleString(),
               url: s.imageUrl,
-              server: s.server || 'Unknown Server', // Added server mapping
+              server: s.server_ip || s.server || 'Unknown Server',
             }))
           }
         }
@@ -62,7 +62,8 @@ const fetchScreenshots = async () => {
           guid: s.active_guid || 'N/A',
           date: new Date(s.createdAt).toLocaleString(),
           url: s.imageUrl,
-          server: s.server || 'Unknown Server', // Added server mapping
+          // Fix: Mapping both 'server_ip' and 'server'
+          server: s.server_ip || s.server || 'Unknown Server',
         }))
       }
     } catch (e) {
@@ -71,22 +72,15 @@ const fetchScreenshots = async () => {
   }
 }
 
-// Function to handle image downloading
-const downloadImage = async (url: string, playerName: string, date: string) => {
-  try {
-    const response = await fetch(url)
-    const blob = await response.blob()
-    const blobUrl = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = blobUrl
-    link.download = `fairshot-${playerName}-${date.replace(/[/, :]/g, '-')}.png`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(blobUrl)
-  } catch (error) {
-    console.error('Download failed:', error)
-  }
+// Simplified download using the direct link
+const downloadImage = (url: string) => {
+  const link = document.createElement('a')
+  link.href = url
+  link.target = '_blank'
+  link.download = '' // Note: Browser cross-origin policies may still open in new tab
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 onMounted(() => {
@@ -131,28 +125,6 @@ const toggleZoom = (e: Event) => {
 
 <template>
   <div class="container mx-auto px-6 py-12">
-    <div
-      v-if="filterGuid"
-      class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl gap-4"
-    >
-      <div class="flex flex-wrap items-center gap-3">
-        <Camera class="w-5 h-5 text-amber-500" />
-        <span class="text-amber-400 font-bold text-sm md:text-base"
-          >Results for: <span class="text-white">{{ filterName || filterGuid }}</span></span
-        >
-        <code class="text-[10px] text-slate-400 font-mono bg-black/30 px-2 py-1 rounded">{{
-          filterGuid
-        }}</code>
-      </div>
-      <RouterLink
-        to="/screenshots"
-        class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-xs md:text-sm font-bold"
-      >
-        <ArrowLeft class="w-4 h-4" />
-        Clear Filter
-      </RouterLink>
-    </div>
-
     <div class="flex items-center justify-between mb-12">
       <div>
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
@@ -180,13 +152,8 @@ const toggleZoom = (e: Event) => {
         <div class="relative aspect-video overflow-hidden border-b border-white/5">
           <img
             :src="ss.url"
-            :alt="`Screenshot by ${ss.player}`"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"
-          ></div>
-
           <div
             class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]"
           >
@@ -200,19 +167,16 @@ const toggleZoom = (e: Event) => {
         </div>
 
         <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500"
-              >
-                <User class="w-5 h-5" />
-              </div>
-              <div>
-                <h3 class="font-bold">{{ ss.player }}</h3>
-                <div class="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-                  <Hash class="w-3 h-3" />
-                  {{ ss.guid }}
-                </div>
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500"
+            >
+              <User class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="font-bold">{{ ss.player }}</h3>
+              <div class="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                <Hash class="w-3 h-3" /> {{ ss.guid }}
               </div>
             </div>
           </div>
@@ -220,8 +184,7 @@ const toggleZoom = (e: Event) => {
           <div
             class="flex items-center gap-2 mb-4 text-[10px] text-emerald-500 uppercase font-black"
           >
-            <Globe class="w-3 h-3" />
-            {{ ss.server }}
+            <Globe class="w-3 h-3" /> {{ ss.server }}
           </div>
 
           <div class="flex items-center justify-between pt-4 border-t border-white/5">
@@ -229,9 +192,8 @@ const toggleZoom = (e: Event) => {
               ss.date
             }}</span>
             <button
-              @click="downloadImage(ss.url, ss.player, ss.date)"
+              @click="downloadImage(ss.url)"
               class="text-slate-400 hover:text-white transition-colors"
-              title="Download Screenshot"
             >
               <Download class="w-4 h-4" />
             </button>
@@ -240,108 +202,44 @@ const toggleZoom = (e: Event) => {
       </div>
     </div>
 
-    <div
-      v-if="screenshots.length === 0"
-      class="flex flex-col items-center justify-center py-20 bg-slate-800/20 border border-white/5 rounded-[2rem] text-center mt-8"
-    >
-      <Camera class="w-16 h-16 text-slate-600 mb-6" />
-      <h2 class="text-2xl font-bold text-white mb-2">No Screenshots Found</h2>
-      <p class="text-slate-400">
-        {{
-          filterGuid
-            ? 'This player has no uploaded fairshots on record.'
-            : 'There are currently no screenshots available.'
-        }}
-      </p>
-    </div>
-
     <Teleport to="body">
       <div
         v-if="selectedIndex !== null"
         @click="closeLightbox"
-        class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex items-center justify-center overscroll-none transition-all duration-300"
-        :class="isZoomed ? 'overflow-auto' : 'overflow-hidden p-6'"
+        class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-6"
       >
         <div class="fixed top-8 right-8 flex items-center gap-4 z-[110]">
           <button
-            @click.stop="
-              downloadImage(
-                screenshots[selectedIndex!]?.url,
-                screenshots[selectedIndex!]?.player,
-                screenshots[selectedIndex!]?.date,
-              )
-            "
-            class="p-3 bg-white/10 text-white rounded-xl hover:bg-emerald-500 hover:text-black transition-colors backdrop-blur-md shadow-2xl"
+            @click.stop="downloadImage(screenshots[selectedIndex!]?.url)"
+            class="p-3 bg-white/10 text-white rounded-xl hover:bg-amber-500 transition-colors"
           >
             <Download class="w-6 h-6" />
           </button>
           <button
-            @click="toggleZoom"
-            class="p-3 bg-white/10 text-white rounded-xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md shadow-2xl"
-          >
-            <ZoomOut v-if="isZoomed" class="w-6 h-6" />
-            <ZoomIn v-else class="w-6 h-6" />
-          </button>
-          <button
             @click="closeLightbox"
-            class="p-3 bg-white/10 text-white rounded-xl hover:bg-red-500 hover:text-white transition-colors backdrop-blur-md shadow-2xl"
+            class="p-3 bg-white/10 text-white rounded-xl hover:bg-red-500 transition-colors"
           >
             <X class="w-6 h-6" />
           </button>
         </div>
 
-        <button
-          @click="prevImage"
-          v-if="screenshots.length > 1"
-          class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 bg-white/5 text-white rounded-2xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md z-[110] shadow-2xl group"
-        >
-          <ChevronLeft class="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
-        </button>
-
-        <button
-          @click="nextImage"
-          v-if="screenshots.length > 1"
-          class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 bg-white/5 text-white rounded-2xl hover:bg-amber-500 hover:text-black transition-colors backdrop-blur-md z-[110] shadow-2xl group"
-        >
-          <ChevronRight class="w-8 h-8 group-hover:translate-x-1 transition-transform" />
-        </button>
-
-        <div
-          class="w-full h-full flex flex-col transition-all duration-500"
-          :class="isZoomed ? 'items-start justify-start p-10' : 'items-center justify-center p-6'"
-        >
+        <div class="w-full h-full flex flex-col items-center justify-center">
           <img
             :src="screenshots[selectedIndex!]?.url"
-            @click.stop="toggleZoom"
-            alt="Enlarged screenshot"
-            class="shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 transition-all duration-500 origin-center shrink-0"
-            :class="
-              isZoomed
-                ? 'min-w-[150vw] cursor-zoom-out rounded-xl'
-                : 'max-w-full max-h-[85vh] object-contain cursor-zoom-in rounded-2xl'
-            "
+            class="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/10 shadow-2xl"
           />
 
           <div
             v-if="!isZoomed"
             @click.stop
-            class="mt-6 flex flex-wrap items-center justify-center gap-3 bg-white/5 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 text-white shadow-2xl z-[105]"
+            class="mt-6 flex items-center gap-4 bg-white/5 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 text-white"
           >
-            <div class="flex items-center gap-2">
-              <User class="w-4 h-4 text-amber-500" />
-              <span class="font-bold tracking-wide">{{ screenshots[selectedIndex!]?.player }}</span>
-            </div>
-            <span class="text-slate-400 text-xs font-mono px-3 border-l border-white/20">{{
+            <span class="font-bold">{{ screenshots[selectedIndex!]?.player }}</span>
+            <span class="text-slate-400 text-xs border-l border-white/20 pl-4">{{
               screenshots[selectedIndex!]?.guid
             }}</span>
-            <div
-              class="flex items-center gap-2 px-3 border-l border-white/20 text-emerald-400 text-xs font-black uppercase"
-            >
-              <Globe class="w-3 h-3" />
-              {{ screenshots[selectedIndex!]?.server }}
-            </div>
-            <span class="text-slate-500 text-xs font-bold px-3 border-l border-white/20">{{
-              screenshots[selectedIndex!]?.date
+            <span class="text-emerald-400 text-xs font-black border-l border-white/20 pl-4">{{
+              screenshots[selectedIndex!]?.server
             }}</span>
           </div>
         </div>
