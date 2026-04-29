@@ -1182,11 +1182,12 @@ const handleLogout = () => {
                       </button>
                       <button
                         @click="deleteWhitelist(file.hash)"
-                      class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
-                      title="Delete"
-                    >
-                      <Trash2 class="w-4 h-4" />
-                    </button>
+                        class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                        title="Delete"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr v-if="whitelistedFiles.length === 0">
@@ -1216,10 +1217,11 @@ const handleLogout = () => {
                   </button>
                   <button
                     @click="deleteWhitelist(file.hash)"
-                  class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
-                >
-                  <Trash2 class="w-4 h-4" />
-                </button>
+                    class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               <div class="space-y-2">
                 <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">File Hash</div>
@@ -1382,11 +1384,12 @@ const handleLogout = () => {
                       </button>
                       <button
                         @click="deleteGuid(item.original)"
-                      class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
-                      title="Delete"
-                    >
-                      <Trash2 class="w-4 h-4" />
-                    </button>
+                        class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                        title="Delete"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr v-if="customGuidsList.length === 0">
@@ -1419,10 +1422,11 @@ const handleLogout = () => {
                   </button>
                   <button
                     @click="deleteGuid(item.original)"
-                  class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
-                >
-                  <Trash2 class="w-4 h-4" />
-                </button>
+                    class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/10">
                 <div class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Mapped To</div>
