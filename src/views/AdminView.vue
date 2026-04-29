@@ -1151,7 +1151,7 @@ const handleLogout = () => {
                     File Name
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
-                    Hash Match
+                    Hash
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Date Added
