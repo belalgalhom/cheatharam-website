@@ -555,6 +555,7 @@ const newLoaderUrl = ref('')
 const newLoaderFileName = ref('')
 const newLoaderVersion = ref('')
 const newLoaderClientSecret = ref('')
+const newLoaderFileSize = ref<number | null>(null)
 const isAddingLoader = ref(false)
 const isUploadingLoaderFile = ref(false)
 const loaderStatus = ref('')
@@ -581,6 +582,7 @@ const handleLoaderFileSelect = async (event: Event) => {
         const data = await res.json()
         newLoaderUrl.value = data.url
         newLoaderFileName.value = file.name
+        newLoaderFileSize.value = data.fileSize ?? file.size
         loaderStatus.value = 'File uploaded successfully! You can now deploy the loader.'
       } else {
         loaderStatus.value = 'File upload failed.'
@@ -614,6 +616,7 @@ const handleAddLoader = async () => {
         fileName: newLoaderFileName.value,
         version: newLoaderVersion.value,
         clientSecret: newLoaderClientSecret.value,
+        fileSize: newLoaderFileSize.value,
       })
       if (res.ok) {
         loaderStatus.value = `Loader updated successfully.`
@@ -621,6 +624,7 @@ const handleAddLoader = async () => {
         newLoaderFileName.value = ''
         newLoaderVersion.value = ''
         newLoaderClientSecret.value = ''
+        newLoaderFileSize.value = null
         editingLoaderId.value = null
         showLoaderForm.value = false
         fetchLoaders()
@@ -634,6 +638,7 @@ const handleAddLoader = async () => {
         fileName: newLoaderFileName.value,
         version: newLoaderVersion.value,
         clientSecret: newLoaderClientSecret.value,
+        fileSize: newLoaderFileSize.value,
         isActive: true,
       })
       if (res.ok) {
@@ -642,6 +647,7 @@ const handleAddLoader = async () => {
         newLoaderFileName.value = ''
         newLoaderVersion.value = ''
         newLoaderClientSecret.value = ''
+        newLoaderFileSize.value = null
         showLoaderForm.value = false
         fetchLoaders()
         setTimeout(() => {
@@ -661,6 +667,7 @@ const editLoader = (l: any) => {
   newLoaderFileName.value = l.fileName
   newLoaderVersion.value = l.version
   newLoaderClientSecret.value = l.clientSecret
+  newLoaderFileSize.value = l.fileSize ?? null
   editingLoaderId.value = l.id
   showLoaderForm.value = true
 }
@@ -1770,7 +1777,7 @@ const handleLogout = () => {
             <p class="text-slate-400">Manage client loaders deployed to game servers.</p>
           </div>
           <button
-            @click="showLoaderForm = !showLoaderForm; if(!showLoaderForm) { editingLoaderId = null; newLoaderUrl = ''; newLoaderFileName = ''; newLoaderVersion = ''; newLoaderClientSecret = ''; }"
+            @click="showLoaderForm = !showLoaderForm; if(!showLoaderForm) { editingLoaderId = null; newLoaderUrl = ''; newLoaderFileName = ''; newLoaderVersion = ''; newLoaderClientSecret = ''; newLoaderFileSize = null; }"
             class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
           >
             <PlusCircle class="w-5 h-5" />
@@ -1876,6 +1883,18 @@ const handleLogout = () => {
               <div>
                 <label
                   class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
+                  >File Size <span class="normal-case text-slate-600">(auto-filled on upload)</span></label
+                >
+                <input
+                  :value="newLoaderFileSize ? (newLoaderFileSize / 1024 / 1024).toFixed(2) + ' MB' : '—'"
+                  type="text"
+                  readonly
+                  class="w-full bg-slate-800/30 border border-white/5 rounded-2xl py-4 px-4 text-slate-500 font-mono cursor-not-allowed select-none shadow-inner"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
                   >Client Secret</label
                 >
                 <input
@@ -1917,6 +1936,9 @@ const handleLogout = () => {
                     Version
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Size
+                  </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     Client Secret
                   </th>
                   <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
@@ -1940,6 +1962,15 @@ const handleLogout = () => {
                       class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono"
                       >v{{ l.version }}</span
                     >
+                  </td>
+                  <td class="px-8 py-6">
+                    <span
+                      v-if="l.fileSize"
+                      class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono"
+                    >
+                      {{ (l.fileSize / 1024 / 1024).toFixed(2) }} MB
+                    </span>
+                    <span v-else class="text-slate-600 text-xs">—</span>
                   </td>
                   <td class="px-8 py-6">
                     <div class="text-[10px] text-amber-500 font-mono bg-amber-500/5 p-2 rounded-lg border border-amber-500/10 break-all w-fit">
@@ -1986,7 +2017,7 @@ const handleLogout = () => {
                   </td>
                 </tr>
                 <tr v-if="loaders.length === 0">
-                  <td colspan="5" class="px-8 py-10 text-center text-slate-500 text-sm">
+                  <td colspan="6" class="px-8 py-10 text-center text-slate-500 text-sm">
                     No loaders found.
                   </td>
                 </tr>
@@ -2032,6 +2063,12 @@ const handleLogout = () => {
                 <div class="flex flex-wrap gap-2">
                   <span class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono">
                     v{{ l.version }}
+                  </span>
+                  <span
+                    v-if="l.fileSize"
+                    class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono"
+                  >
+                    {{ (l.fileSize / 1024 / 1024).toFixed(2) }} MB
                   </span>
                   <span
                     v-if="l.isActive"
