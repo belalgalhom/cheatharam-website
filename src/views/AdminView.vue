@@ -16,6 +16,7 @@ import {
   Trash2,
   Star,
   UploadCloud,
+  DownloadCloud,
 } from 'lucide-vue-next'
 
 const isAuthenticated = ref(false)
@@ -467,12 +468,117 @@ const deletePayload = async (id: number) => {
   }
 }
 
+// Loader State
+const loaders = ref<any[]>([])
+const showLoaderForm = ref(false)
+const newLoaderUrl = ref('')
+const newLoaderFileName = ref('')
+const newLoaderVersion = ref('')
+const newLoaderClientSecret = ref('')
+const isAddingLoader = ref(false)
+const isUploadingLoaderFile = ref(false)
+const loaderStatus = ref('')
+
+const handleLoaderFileSelect = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    const file = target.files[0]
+    if (!file) return
+
+    if (file.size > 10 * 1024 * 1024) {
+      loaderStatus.value = 'File too large. Maximum size is 10MB.'
+      target.value = ''
+      return
+    }
+
+    isUploadingLoaderFile.value = true
+    loaderStatus.value = `Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`
+    try {
+      const formData = new FormData()
+      formData.append('loader', file)
+      const res = await api.post('/upload/loader', formData)
+      if (res.ok) {
+        const data = await res.json()
+        newLoaderUrl.value = data.url
+        newLoaderFileName.value = file.name
+        loaderStatus.value = 'File uploaded successfully! You can now deploy the loader.'
+      } else {
+        loaderStatus.value = 'File upload failed.'
+      }
+    } catch (e) {
+      console.error(e)
+      loaderStatus.value = 'File upload error.'
+    } finally {
+      isUploadingLoaderFile.value = false
+      target.value = ''
+    }
+  }
+}
+
+const fetchLoaders = async () => {
+  try {
+    const res = await api.get('/loaders')
+    if (res.ok) loaders.value = await res.json()
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const handleAddLoader = async () => {
+  if (!newLoaderUrl.value || !newLoaderFileName.value || !newLoaderVersion.value || !newLoaderClientSecret.value) return
+  isAddingLoader.value = true
+  try {
+    const res = await api.post('/loaders', {
+      url: newLoaderUrl.value,
+      fileName: newLoaderFileName.value,
+      version: newLoaderVersion.value,
+      clientSecret: newLoaderClientSecret.value,
+      isActive: true,
+    })
+    if (res.ok) {
+      loaderStatus.value = `Loader v${newLoaderVersion.value} registered successfully.`
+      newLoaderUrl.value = ''
+      newLoaderFileName.value = ''
+      newLoaderVersion.value = ''
+      newLoaderClientSecret.value = ''
+      showLoaderForm.value = false
+      fetchLoaders()
+      setTimeout(() => {
+        loaderStatus.value = ''
+      }, 3000)
+    }
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isAddingLoader.value = false
+  }
+}
+
+const activateLoader = async (id: number) => {
+  try {
+    const res = await api.put(`/loaders/${id}/active`)
+    if (res.ok) fetchLoaders()
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const deleteLoader = async (id: number) => {
+  try {
+    const res = await api.delete(`/loaders/${id}`)
+    if (res.ok) fetchLoaders()
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 onMounted(() => {
   if (api.getToken()) {
     isAuthenticated.value = true
     fetchWhitelists()
     fetchGuids()
     fetchPayloads()
+    fetchLoaders()
   }
 })
 
@@ -491,6 +597,7 @@ const handleLogin = async () => {
     fetchWhitelists()
     fetchGuids()
     fetchPayloads()
+    fetchLoaders()
   } catch (err: any) {
     loginError.value = err.message || 'Login failed'
   } finally {
@@ -649,6 +756,18 @@ const handleLogout = () => {
         >
           <Package class="w-4 h-4" />
           Payloads
+        </button>
+        <button
+          @click="activeTab = 'loaders'"
+          :class="[
+            'px-4 md:px-6 py-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2 whitespace-nowrap',
+            activeTab === 'loaders'
+              ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+              : 'text-slate-400 hover:text-white',
+          ]"
+        >
+          <DownloadCloud class="w-4 h-4" />
+          Loaders
         </button>
       </div>
 
@@ -1475,6 +1594,282 @@ const handleLogout = () => {
             </div>
             <div v-if="payloads.length === 0" class="p-10 text-center text-slate-500 text-sm">
               No payloads found.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Loaders -->
+      <div v-else-if="activeTab === 'loaders'" class="animate-fadeIn space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+              <DownloadCloud class="w-8 h-8 text-amber-500" />
+              Loader Manager
+            </h2>
+            <p class="text-slate-400">Manage client loaders deployed to game servers.</p>
+          </div>
+          <button
+            @click="showLoaderForm = !showLoaderForm"
+            class="px-6 py-3 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+          >
+            <PlusCircle class="w-5 h-5" />
+            {{ showLoaderForm ? 'Cancel' : 'Add Loader' }}
+          </button>
+        </div>
+
+        <!-- Success Status -->
+        <div
+          v-if="loaderStatus"
+          class="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20"
+        >
+          <Check class="w-5 h-5" />
+          {{ loaderStatus }}
+        </div>
+
+        <!-- Add Loader Form -->
+        <div
+          v-if="showLoaderForm"
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 shadow-2xl animate-fadeIn"
+        >
+          <form @submit.prevent="handleAddLoader" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="md:col-span-2">
+                <label
+                  class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
+                  >Loader Upload</label
+                >
+                <label
+                  class="flex items-center justify-center w-full py-4 px-4 border-2 border-dashed border-amber-500/30 rounded-2xl bg-slate-800/20 hover:bg-slate-800/80 hover:border-amber-500/50 transition-all cursor-pointer group gap-3"
+                >
+                  <input
+                    type="file"
+                    class="hidden"
+                    @change="handleLoaderFileSelect"
+                    :disabled="isUploadingLoaderFile"
+                  />
+                  <UploadCloud
+                    v-if="!isUploadingLoaderFile"
+                    class="w-6 h-6 text-amber-500/80 group-hover:text-amber-400"
+                  />
+                  <span
+                    v-if="!isUploadingLoaderFile"
+                    class="font-bold tracking-wide text-amber-500/80 group-hover:text-amber-400"
+                    >Click to Upload Loader File</span
+                  >
+                  <span v-else class="text-amber-500 font-bold flex items-center gap-2">
+                    <span
+                      class="animate-spin w-5 h-5 border-2 border-amber-500/30 border-t-amber-500 rounded-full"
+                    ></span>
+                    Uploading File...
+                  </span>
+                </label>
+              </div>
+
+              <div class="md:col-span-2 flex items-center my-0">
+                <div class="h-px bg-white/5 flex-1"></div>
+                <span class="px-4 text-xs font-bold uppercase tracking-widest text-slate-500"
+                  >OR PROVIDE URL MANUALLY</span
+                >
+                <div class="h-px bg-white/5 flex-1"></div>
+              </div>
+
+              <div class="md:col-span-2">
+                <label
+                  class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
+                  >Download URL</label
+                >
+                <input
+                  v-model="newLoaderUrl"
+                  type="url"
+                  required
+                  placeholder="https://cdn.example.com/loader.exe"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
+                  >File Name</label
+                >
+                <input
+                  v-model="newLoaderFileName"
+                  type="text"
+                  required
+                  placeholder="e.g. loader_v2.exe"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
+                  >Version</label
+                >
+                <input
+                  v-model="newLoaderVersion"
+                  type="text"
+                  required
+                  placeholder="e.g. 2.1.0"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1"
+                  >Client Secret</label
+                >
+                <input
+                  v-model="newLoaderClientSecret"
+                  type="text"
+                  required
+                  placeholder="e.g. secret123"
+                  class="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 px-4 text-white font-mono focus:outline-none focus:border-amber-500/50 transition-all shadow-inner"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              :disabled="isAddingLoader"
+              class="py-4 px-8 bg-amber-500 text-black font-black text-sm rounded-2xl hover:bg-amber-400 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <PlusCircle v-if="!isAddingLoader" class="w-5 h-5" />
+              <span v-if="!isAddingLoader">Deploy Loader</span>
+              <span
+                v-else
+                class="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
+              ></span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Loaders Table -->
+        <div
+          class="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl"
+        >
+          <div class="overflow-x-auto hidden md:block">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-white/5 border-b border-white/5">
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    File Name
+                  </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Version & Secret
+                  </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Status
+                  </th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                <tr v-for="l in loaders" :key="l.id" class="hover:bg-white/5 transition-colors">
+                  <td class="px-8 py-6">
+                    <div class="font-bold text-white">{{ l.fileName }}</div>
+                    <div class="text-xs text-slate-500 font-mono mt-1 truncate max-w-[200px]">
+                      {{ l.url }}
+                    </div>
+                  </td>
+                  <td class="px-8 py-6">
+                    <span
+                      class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono"
+                      >v{{ l.version }}</span
+                    >
+                    <div class="text-[10px] text-amber-500 font-mono mt-1 break-all">Secret: {{ l.clientSecret }}</div>
+                  </td>
+                  <td class="px-8 py-6">
+                    <span
+                      v-if="l.isActive"
+                      class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 w-fit"
+                    >
+                      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE
+                    </span>
+                    <span
+                      v-else
+                      class="px-3 py-1 rounded-full text-xs font-black bg-slate-700/50 text-slate-400"
+                      >INACTIVE</span
+                    >
+                  </td>
+                  <td class="px-8 py-6">
+                    <div class="flex items-center gap-2">
+                      <button
+                        v-if="!l.isActive"
+                        @click="activateLoader(l.id)"
+                        class="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold text-xs hover:bg-emerald-500/20 transition-colors border border-emerald-500/20 flex items-center gap-2"
+                      >
+                        <Star class="w-4 h-4" /> Activate
+                      </button>
+                      <button
+                        @click="deleteLoader(l.id)"
+                        class="p-1.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                        title="Delete"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="loaders.length === 0">
+                  <td colspan="4" class="px-8 py-10 text-center text-slate-500 text-sm">
+                    No loaders found.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards Layout -->
+          <div class="md:hidden divide-y divide-white/5">
+            <div
+              v-for="l in loaders"
+              :key="l.id"
+              class="p-6 space-y-4 hover:bg-white/5 transition-colors"
+            >
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="font-bold text-white">{{ l.fileName }}</div>
+                  <div class="text-[10px] text-slate-500 font-mono mt-1 break-all">{{ l.url }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    v-if="!l.isActive"
+                    @click="activateLoader(l.id)"
+                    class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  >
+                    <Star class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="deleteLoader(l.id)"
+                    class="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="flex flex-wrap gap-2">
+                  <span class="px-3 py-1 rounded-lg text-xs font-black bg-slate-700/50 text-slate-300 font-mono">
+                    v{{ l.version }}
+                  </span>
+                  <span
+                    v-if="l.isActive"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE
+                  </span>
+                </div>
+                <div class="space-y-1">
+                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Secret</div>
+                  <div class="text-xs text-amber-500 font-mono bg-amber-500/5 p-2 rounded-lg border border-amber-500/10 break-all">
+                    {{ l.clientSecret }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="loaders.length === 0" class="p-10 text-center text-slate-500 text-sm">
+              No loaders found.
             </div>
           </div>
         </div>
