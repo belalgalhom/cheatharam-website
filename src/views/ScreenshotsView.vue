@@ -256,7 +256,7 @@ const toggleZoom = (e: Event) => {
       >
         <div class="fixed top-8 right-8 flex items-center gap-4 z-[110]">
           <button
-            @click.stop="downloadImage(ss.url)"
+            @click.stop="downloadImage(screenshots[selectedIndex!]?.url)"
             class="p-3 bg-white/10 text-white rounded-xl hover:bg-emerald-500 hover:text-black transition-colors backdrop-blur-md shadow-2xl"
           >
             <Download class="w-6 h-6" />
