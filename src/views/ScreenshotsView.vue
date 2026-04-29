@@ -13,7 +13,7 @@ import {
   ZoomIn,
   ZoomOut,
   X,
-  Globe, // Added Globe icon for server IP
+  Globe,
 } from 'lucide-vue-next'
 import { api } from '@/utils/api'
 
